@@ -1,0 +1,72 @@
+\section{Empirical Evaluation}
+\label{section:evaluation}
+
+\subsection{Performance Metrics}
+\begin{itemize}
+  \item \textbf{Claim-level grounding Precision / Recall / Macro-F1} against human
+  span-level labels: the core detection quality (does a \textsc{fail}/\textsc{warn}
+  flag coincide with a truly unsupported span?).
+  \item \textbf{Hallucination detection rate} (recall on unsupported claims) and
+  \textbf{false-flag rate} (flags on supported claims), reported as a trade-off curve.
+  \item \textbf{Agreement with humans}: Cohen's $\kappa$ between each scorer's verdict and
+  human annotation.
+  \item \textbf{Determinism}: variance of each scorer's verdict across repeated runs under
+  identical inputs (expected $0$ for embedding/NLI scorers, non-zero for LLM-judge).
+  \item \textbf{Cost / latency}: wall-clock and \$-cost per 1k claims (judge-model API
+  calls vs.\ local scorers).
+  \item \textbf{Configuration stability}: how stable each scorer's decision threshold is
+  across encoders and data splits.
+  \item \textbf{Language-stratified analysis}: detection quality reported separately for
+  monolingual vs.\ cross-lingual / code-switched claims (flagged by a character-level LID
+  from course HW1), given the Chinese corpus and Face4RAG.
+\end{itemize}
+Where a scorer is ordinal, we report a supported / uncertain / unsupported decision; an
+explicit uncertain band is more honest than a forced binary when semantic similarity is an
+imperfect proxy for entailment.
+
+\subsection{Baseline Methods}
+\begin{itemize}
+  \item \textbf{Baseline 1 --- Presence-only citation check} \citep{gao2023alce}:
+  verify only that each cited id exists and is cited; no claim$\leftrightarrow$source
+  grounding. This is the ``floor'' the evaluated scorers must beat (and is what typical RAG
+  tutorials implement).
+  \item \textbf{Baseline 2 --- LLM-as-judge faithfulness} \citep{es2024ragas}:
+  RAGAS faithfulness (and/or DeepEval) scoring each claim with a judge LLM;
+  the de-facto SOTA, used to expose the determinism/cost gap.
+  \item \textbf{Baseline 3 --- NLI-based grounding} \citep{honovich2022true}:
+  a natural-language-inference model scoring entailment of claim by cited passage;
+  the strongest non-LLM-judge comparison and a candidate component of our own pipeline.
+  \item \textbf{Baseline 4 --- Sampling consistency} \citep{manakul2023selfcheckgpt}:
+  SelfCheckGPT-style self-consistency as a reference point for reference-free detection.
+  \item \textbf{Baseline 5 --- purpose-built RAG hallucination detectors}: open/production
+  detectors benchmarked by \citet{sardana2025realtime} (e.g., Vectara HHEM, Patronus Lynx)
+  as strong reference-free comparisons beyond generic LLM-judge.
+  \item \textbf{Embedding-similarity scorer}: an off-the-shelf normalized-embedding cosine
+  (e.g., bge-m3) as a lightweight, deterministic comparison point; we also include a
+  from-scratch self-attention text-pair scorer built in course HW1 (Problem~2) as an
+  additional reference.
+\end{itemize}
+
+\subsection{Benchmark Tasks or Datasets}
+\begin{itemize}
+  \item \textbf{RAGTruth} \citep{niu2024ragtruth} (primary): a RAG hallucination corpus
+  with word/span-level human annotations over QA, summarization, and data-to-text,
+  ideal for measuring a claim-level detector against ground truth that is \emph{not}
+  LLM-generated.
+  \item \textbf{ALCE} \citep{gao2023alce} (secondary): citation-quality benchmark
+  (ASQA / QAMPARI / ELI5) to test the citation-alignment stage and citation
+  recall/precision.
+  \item \textbf{FActScore} \citep{min2023factscore} (optional): atomic-fact factuality on
+  biographies, to probe the claim-segmentation + grounding stages on long-form text.
+  \item \textbf{Face4RAG} \citep{xu2024face4rag} (Chinese RAG factual consistency): a
+  factual-consistency benchmark for RAG \emph{in Chinese}---directly matching our course
+  corpus's language---with a typology of inconsistency errors (incl.\ logical-fallacy).
+  \item \textbf{FaithBench} \citep{bao2025faithbench} (hard cases): built from examples
+  where leading detectors disagree, to stress-test the gate exactly where LLM-judges fail.
+  \item \textbf{Course RAG corpus} (in-domain demo): the knowledge base shipped with
+  Program~1 (a Chinese QA set on students' part-time labor rights), used for an end-to-end
+  qualitative demo of the gate on the exact system the course provides.
+\end{itemize}
+A small subset ($\sim$100--150 claims) will be re-annotated by the team to calibrate
+thresholds and audit RAGTruth alignment; calibration data and thresholds will be released
+for reproducibility.

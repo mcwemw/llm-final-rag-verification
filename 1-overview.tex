@@ -1,0 +1,71 @@
+\section{Project Overview}
+\label{section:intro}
+
+\subsection{Profile}
+
+\paragraph{Track: 2. Dataset and Benchmark / 3. Application}
+An evaluation study: can \emph{existing, publicly available} faithfulness-verification
+techniques be adopted as a verification layer for a retrieval-augmented QA system?
+
+\paragraph{Abstract and project goal:}
+Retrieval-augmented generation (RAG) grounds large language model (LLM) answers in
+retrieved documents, but a grounded \emph{citation} does not guarantee a grounded
+\emph{claim}: an answer can cite a source and still assert something the cited passage
+does not support. A growing body of \emph{published} work offers ways to measure this
+``faithfulness''---LLM-as-judge scoring (RAGAS~\citep{es2024ragas}), sampling consistency
+(SelfCheckGPT~\citep{manakul2023selfcheckgpt}), atomic-fact and claim-level methods
+(FActScore~\citep{min2023factscore}, VeriScore~\citep{song2024veriscore}),
+NLI-based factual consistency (TRUE~\citep{honovich2022true}), and purpose-built detectors
+benchmarked in~\citet{sardana2025realtime}. This project \textbf{evaluates the adoption of
+these published techniques} as a post-generation verification layer on a RAG QA system:
+we segment answers into claims, check each claim against its cited source using the
+published scorers above, and benchmark their agreement with human labels, cost, and
+reproducibility. The goal is a practical recommendation---\emph{which published
+verification technique(s) are worth adopting, and under what trade-offs}---evaluated on
+public benchmarks.
+
+\paragraph{TL;DR (``Too Long; Didn't Read"):}
+An evaluation of existing published faithfulness-verification techniques, applied and
+benchmarked as a claim-checking layer on a RAG QA system.
+
+\subsection{Motivation}
+\begin{itemize}
+    \item \textbf{Why is the problem interesting?}
+    RAG is the default recipe for grounding LLMs, yet deployed systems still emit
+    ``plausible but unsupported'' statements. Many verification techniques now exist in the
+    literature, but they are rarely compared \emph{together} on the same RAG system with a
+    common protocol for accuracy, cost, and reproducibility---leaving practitioners without
+    clear adoption guidance.
+
+    \item \textbf{Critical challenges.}
+    \begin{itemize}
+      \item \emph{Challenge 1:} \textbf{Claim$\leftrightarrow$source alignment.}
+      Faithfulness is a property of individual claims; we must segment answers into
+      checkable claims and bind each to the cited evidence before any published scorer
+      applies.
+      \item \emph{Challenge 2:} \textbf{Fair comparison across method families.}
+      LLM-judge, NLI, sampling-consistency, and embedding-similarity scorers differ in
+      cost, determinism, and granularity; comparing them fairly on one system and protocol
+      is non-trivial.
+      \item \emph{Challenge 3:} \textbf{Evaluating against non-circular ground truth.}
+      We rely on human span-level labels (RAGTruth~\citep{niu2024ragtruth}) rather than a
+      second LLM's opinion.
+    \end{itemize}
+
+    \item \textbf{Why is the problem open, and prior work.}
+    No single published technique dominates: a 2025 review notes LLM-judge scores are the
+    most human-correlated yet costly and opaque~\citep{malin2025faithfulnessreview};
+    reliability studies show single-shot LLM judgments are
+    inconsistent~\citep{schroeder2024trustjudge, yamauchi2026empiricaljudge}; and
+    FaithBench~\citep{bao2025faithbench} is built from cases where leading detectors
+    \emph{disagree}, with top detectors near $50\%$ accuracy. On the tooling side,
+    commercial LLM-application observability platforms such as LangSmith bundle faithfulness
+    checking as paid, hosted LLM-judge-style evaluation, which sharpens---rather than
+    answers---the practitioner's question of which technique to adopt and at what cost.
+    Grounding foundations: RAG~\citep{lewis2020rag} and REALM~\citep{guu2020realm}.
+
+    \item \textbf{State of the art (our view).} For practical faithfulness scoring,
+    LLM-as-judge (RAGAS~\citep{es2024ragas}) is the de-facto standard; NLI-based scoring
+    (TRUE~\citep{honovich2022true}) is the strongest non-LLM-judge line. Our study
+    benchmarks these published options rather than proposing a new one.
+\end{itemize}

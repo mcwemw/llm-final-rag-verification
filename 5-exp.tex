@@ -1,0 +1,46 @@
+\section{Experimental Results}
+\label{section:exp}
+\subsection{Evaluation of Baseline Methods}
+\label{section:exp:baseline}
+
+This is a proposal; below is the planned experimental protocol and the baseline numbers
+we will reproduce first.
+
+\textbf{Planned protocol.}
+\begin{enumerate}
+  \item \textbf{Reproduce the floor.} Run the presence-only citation check---the one built
+  into the course's Program~2, which (per its authors' note) verifies only that a citation
+  id exists \citep{gao2023alce}---on RAGTruth~\citep{niu2024ragtruth} and report how many
+  human-annotated unsupported spans it misses (expected: most). This quantifies the gap the
+  published verification techniques must close on the provided system.
+  \item \textbf{Reproduce the LLM-judge standard.} Run RAGAS faithfulness~\citep{es2024ragas}
+  on the same claims and record (a) detection F1 vs.\ human labels, (b) run-to-run verdict
+  variance under identical inputs, and (c) API cost/latency per 1k claims.
+  \item \textbf{Evaluate the non-LLM-judge scorers.} Apply the NLI and
+  embedding-similarity scorers (and the course HW1 self-attention scorer) with their
+  documented decision rules; report detection P/R/F1, $\kappa$ vs.\ humans, determinism,
+  and cost on the test split.
+  \item \textbf{Ablations.} encoder choice; claim-segmentation granularity; a combined
+  embedding$+$NLI decision.
+\end{enumerate}
+
+\textbf{Reporting template (to be filled with measured numbers).}
+\begin{center}
+\begin{tabular}{lcccc}
+\toprule
+Method & Detection F1 & $\kappa$ vs.\ human & Determinism (var) & Cost / 1k claims \\
+\midrule
+Presence-only \citep{gao2023alce}      & TBD & TBD & $0$ & $\approx 0$ \\
+LLM-judge (RAGAS) \citep{es2024ragas}  & TBD & TBD & $>0$ (measured) & API \\
+NLI-based \citep{honovich2022true}     & TBD & TBD & $0$ & GPU \\
+Embedding-similarity (bge-m3)          & TBD & TBD & $0$ & no judge calls \\
+Self-attention scorer (course HW1)     & TBD & TBD & $0$ & no judge calls \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\textbf{Success criterion.} The study succeeds if it produces a clear, evidence-based
+recommendation: which published verification technique(s) give the best
+accuracy/cost/reproducibility trade-off as a RAG verification layer, and where a
+lightweight non-LLM-judge scorer suffices versus where a heavier method is needed---an
+honest comparative result either way.

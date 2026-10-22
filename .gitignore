@@ -1,0 +1,17 @@
+# Belt-and-suspenders: keep research-grade code, data, and internal notes OUT of this public repo.
+*.py
+faithfulness-gate/
+research-connection.md
+STATUS.md
+_rag-variant/
+*-internal.md
+lit-note*.md
+calibration*/
+*.csv
+*.jsonl
+# LaTeX build artifacts
+*.aux
+*.out
+*.blg
+*.log
+*.bbl

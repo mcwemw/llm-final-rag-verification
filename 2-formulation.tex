@@ -1,0 +1,28 @@
+\section{Problem Formulation}
+
+\textbf{Task setting.} Retrieval-augmented question answering. Given a question $q$, a
+retriever returns documents $D=\{d_1,\dots,d_k\}$, and an LLM produces an answer $a$ that
+cites document ids. We study the downstream \emph{verification} task: for each atomic
+claim in $a$, decide whether it is supported by the specific source it cites. The base RAG
+system (vector-DB builder $+$ retrieval-augmented QA with citations) is the
+course-provided Program~1/Program~2, so our work targets the \emph{evaluation of published
+verification techniques} on top of it, not re-implementing retrieval or generation.
+
+\textbf{Information available.} The verifier sees the answer $a$, the retrieved passages
+$D$ (full text $+$ ids), and the citation markers in $a$. It does not see a gold answer.
+
+\textbf{Supervision / feedback signal.} Human span-level hallucination annotations in
+RAGTruth~\citep{niu2024ragtruth} serve as ground truth; a small held-out, human-labeled
+set of (claim, cited-passage, grounded?) pairs is used only to configure each published
+scorer's decision threshold where applicable.
+
+\textbf{Optimization / evaluation objective.} For each published scorer
+$g(\text{claim},\text{source})$ under study, we measure how well its supported/unsupported
+decision matches human labels (macro-F1), alongside its cost, latency, and run-to-run
+determinism. The study's aim is comparative: identify which published technique(s) give
+the best accuracy/cost/reproducibility trade-off as a RAG verification layer.
+
+\textbf{Assumptions.} (i) Answers can be segmented into reasonably atomic claims by
+published methods or simple heuristics. (ii) The compared scorers are used as published
+(off-the-shelf), with only documented configuration. (iii) Modest compute: a single
+consumer GPU and public/local models.

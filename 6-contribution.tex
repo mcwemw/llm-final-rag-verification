@@ -1,0 +1,27 @@
+\section{Expected Contributions of Each Team Member}
+
+We work in a shared repository with a common evaluation harness so members can work in
+parallel and integrate through fixed data and metric contracts. (Allocation is tentative
+and will be rebalanced as we proceed.)
+
+\begin{itemize}
+    \item \textbf{Mei-Chen (Emma) Wu (414551035):} verification-layer integration ---
+    a character-level language-ID pre-filter (course HW1), claim segmentation and citation
+    alignment, wiring the published scorers
+    (embedding-similarity, NLI, and the course HW1 self-attention scorer) behind a common
+    interface, and the metric harness (detection F1, $\kappa$, determinism, cost).
+    \item \textbf{Chun-Yao Tseng (315551125):} RAG base + benchmarks --- stand up the
+    course Program~1/Program~2 (vector DB $+$ cited QA), load RAGTruth/Face4RAG/FaithBench
+    and the human-labeled configuration subset, and run the LLM-judge (RAGAS) and
+    purpose-built detector baselines.
+    \item \textbf{Bo-Yu Xu (315511057):} analysis + writing --- the
+    accuracy/cost/reproducibility comparison, the adoption recommendation, figures/tables,
+    and the final report.
+    \item \textbf{Noa Andre (315554801):} survey + data --- the review of published
+    faithfulness-verification techniques (RAGAS, FActScore, NLI, VeriScore, RAGTruth,
+    FaithBench, Face4RAG), dataset curation and preprocessing of the evaluation corpora,
+    and reproducibility packaging of the released splits and configs.
+\end{itemize}
+
+The two load-bearing deliverables are (1)~a fair comparison of \emph{published}
+verification techniques on one RAG system and (2)~a reproducible adoption recommendation.
