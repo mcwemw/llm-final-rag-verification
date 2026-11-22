@@ -1,0 +1,22 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "claim_citation.schema.json",
+  "title": "AlignedClaim",
+  "description": "Block 4 output. One claim bound to the source span it cites. Consumed by every grounding scorer (Block 5).",
+  "type": "object",
+  "required": ["claim_id", "claim_text", "cited_doc_id", "cited_span", "alignment"],
+  "additionalProperties": false,
+  "properties": {
+    "claim_id": { "type": "string", "minLength": 1 },
+    "claim_text": { "type": "string", "minLength": 1 },
+    "cited_doc_id": { "type": ["string", "null"] },
+    "cited_span": { "type": ["string", "null"] },
+    "alignment": {
+      "type": "string",
+      "enum": ["explicit", "nearest", "none"],
+      "description": "explicit = claim falls inside a declared citation span; nearest = retrieved closest span; none = no source -> downstream UNSOURCED"
+    },
+    "char_start": { "type": "integer", "minimum": 0 },
+    "char_end": { "type": "integer", "minimum": 0 }
+  }
+}

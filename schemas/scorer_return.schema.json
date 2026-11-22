@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "scorer_return.schema.json",
+  "title": "ScorerResult",
+  "description": "Block 5 output. Uniform return of every grounding scorer (embedding / NLI / LLM-judge baseline). Block 6 maps score + thresholds -> verdict.",
+  "type": "object",
+  "required": ["claim_id", "method", "score", "latency_ms", "cost_usd"],
+  "additionalProperties": false,
+  "properties": {
+    "claim_id": { "type": "string", "minLength": 1 },
+    "method": {
+      "type": "string",
+      "description": "scorer id, e.g. bge-m3-cosine | hw1-selfattn | ragas-llm-judge | nli-true | selfcheckgpt"
+    },
+    "score": { "type": "number", "minimum": 0.0, "maximum": 1.0 },
+    "latency_ms": { "type": "number", "minimum": 0.0 },
+    "cost_usd": { "type": "number", "minimum": 0.0 },
+    "deterministic": {
+      "type": "boolean",
+      "description": "true for embedding/NLI (fixed weights, no sampling); false for LLM-judge baselines"
+    }
+  }
+}

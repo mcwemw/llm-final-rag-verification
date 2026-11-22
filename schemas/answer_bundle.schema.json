@@ -1,0 +1,27 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "answer_bundle.schema.json",
+  "title": "AnswerBundle",
+  "description": "Block 1 -> Block 3 interface. Output of the RAG QA system (Program 2).",
+  "type": "object",
+  "required": ["question", "answer", "citations"],
+  "additionalProperties": false,
+  "properties": {
+    "question": { "type": "string", "minLength": 1 },
+    "answer": { "type": "string", "minLength": 1 },
+    "citations": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["doc_id", "span_start", "span_end", "text"],
+        "additionalProperties": false,
+        "properties": {
+          "doc_id": { "type": "string", "minLength": 1 },
+          "span_start": { "type": "integer", "minimum": 0 },
+          "span_end": { "type": "integer", "minimum": 0 },
+          "text": { "type": "string" }
+        }
+      }
+    }
+  }
+}
