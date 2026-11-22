@@ -10,15 +10,18 @@
 1. **生成層刻意隔離在 gate 之外**：RAG QA 是非決定性生成層（Block 1 ❌ determinism）。把它和驗證層（Block 3–7）解耦，gate 才能宣稱 variance=0——**本模組的產出是「被驗的對象」，不是 gate 的一部分**。
 2. **baselines 必須吃同一 interface**：所有被評測技術（含 Emma 接的 embedding/NLI/HW1）都走 `scorer.score(claim, cited_docs)->ScorerResult`。**公平比較是本研究 load-bearing 交付①**——同輸入、同指標，才能說「哪個已發表技術在 F1 / cost / variance 上較優」。
 3. **LLM-judge 是被評測技術之一**：RAGAS（groq LLM-judge）的 variance>0、cost>0 是**被量測的性質**，和其他已發表技術一起進比較表，讓採用建議有依據——不是攻擊它，是評估它。
-4. **不重造 RAG**：直接用課程原始碼 `yenlung/Generative-AI` 的 Program 1（向量庫+FAISS）+ Program 2（cited QA，走 groq gpt-oss），省時且與課程脈絡一致。
+4. **不重造 RAG**：直接用課程原始碼 `yenlung/Generative-AI` 的兩支 notebook，省時且與課程脈絡一致：
+   - **Program 1**：`RAG_01_打造你的_RAG_系統.ipynb`（建 embedding index + FAISS 向量庫）
+   - **Program 2**：`RAG_02_使用篇.ipynb`（cited QA，走 groq gpt-oss）
+   - 語料資料：`rag-data.zip`；預建向量庫：`vector_embedding.zip`
 
 ---
 
 ## 完成順序步驟（含目標日 / 依賴）
 > 🔴 今天=11/20，Block1-2 目標日 10/27–10/30 應已完成，請核對；baselines 若未齊是目前最可能的 critical path。
 
-1. **[Block 1, 10/27] Program 1**：建 embedding index（課程向量庫+FAISS），語料=打工權益 KB。跑通檢索 top-k。
-2. **[Block 1-2, 10/30] Program 2 + AnswerBundle**：cited QA 生成帶 citation 的答案 → **嚴格輸出 `AnswerBundle` schema**（吳-Gate 10/24 定）。
+1. **[Block 1, 10/27] Program 1**（`RAG_01_打造你的_RAG_系統.ipynb`）：建 embedding index（課程向量庫+FAISS），語料=打工權益 KB（`rag-data.zip`）。跑通檢索 top-k。
+2. **[Block 1-2, 10/30] Program 2 + AnswerBundle**（`RAG_02_使用篇.ipynb`）：cited QA 生成帶 citation 的答案 → **嚴格輸出 `AnswerBundle` schema**（吳-Gate 10/24 定）。
    - 不變式：每 citation 的 `doc_id` 存在於語料庫、`span_*` 落在 doc 長度內。
    - 驗收：JSON Schema draft2020-12 validate 過；存 **5 筆 example** 進 repo（吳-Gate 開發要吃）。
 3. **[Block 5 baselines] 四個對照 scorer（同 interface）**：
@@ -58,6 +61,6 @@ SelfCheckGPT   0.77   1200        0.006     var>0
 - [ ] 與 Emma 對齊 harness 的 metric 計算口徑一致。
 
 ## 依賴
-- **上游**：課程 Program 1/2 原始碼（`_repo/`）、艾-Survey 的語料（RAGTruth/ALCE）。
+- **上游**：課程原始碼（`RAG_01_*.ipynb` / `RAG_02_*.ipynb` from `yenlung/Generative-AI`）、艾-Survey 的語料（RAGTruth/ALCE）。
 - **下游**：吳-Gate（吃本模組的 `AnswerBundle` + baselines 做統一量測）。
 - 🔴 **本模組是目前最可能的瓶頸**：吳-Gate 等本模組的 5 筆 example 才能端到端測。**AnswerBundle 契約一鎖死就先丟 5 筆過去**，baselines 可並行補。
