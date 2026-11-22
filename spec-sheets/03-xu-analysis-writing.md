@@ -1,4 +1,4 @@
-# 分工規格書 ③ — M-Analysis
+# 分工規格書 ③ — 許-Analysis
 ## 角色：Analysis + Adoption Recommendation + Writing（公開 eval 版）
 
 **負責**：accuracy / cost / reproducibility 三軸比較 · **採用建議**（哪個已發表技術值得當 RAG 驗證層）· 圖表 · final report 主筆。
@@ -15,7 +15,7 @@
 ---
 
 ## 完成順序步驟（含目標日 / 依賴）
-> 本模組的工作大多在 M-Gate/M-RAG 出數字之後（11/24 harness 出表起），前期先搭骨架。
+> 本模組的工作大多在 吳-Gate/曾-RAG 出數字之後（11/24 harness 出表起），前期先搭骨架。
 
 1. **[前期，現在就能做] report 骨架**：NeurIPS 6 節對齊公開 proposal（Overview/Formulation/Evaluation/Methodology/Experimental Results/Contributions），搬 proposal 內容進架構、佔好圖表位。
 2. **[11/24 後] 主比較表**：各已發表技術 × {F1, κ, determ_var, cost, latency} 排版；標最佳、determ_var=0 粗體。
@@ -49,5 +49,5 @@ WARN 帶抽樣 N=30
 - [ ] 全文無「我方 novel 方法」字眼（合規）；限制欄誠實列。
 
 ## 依賴
-- **上游**：M-Gate（比較表、verdict、WARN 樣本）、M-RAG（baselines 數字）、M-Survey（splits/configs/survey）。
+- **上游**：吳-Gate（比較表、verdict、WARN 樣本）、曾-RAG（baselines 數字）、艾-Survey（splits/configs/survey）。
 - **下游**：全組（report + 12/4 投影片的講稿底）。

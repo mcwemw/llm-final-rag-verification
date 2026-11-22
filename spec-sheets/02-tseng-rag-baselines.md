@@ -1,8 +1,8 @@
-# 分工規格書 ② — M-RAG
+# 分工規格書 ② — 曾-RAG
 ## 角色：RAG Base + Baselines
 
 **負責 Block**：1 RAG QA System · 2 AnswerBundle 產生者 · 5 Grounding Scorer 的 **baselines**（RAGAS / NLI / SelfCheckGPT）· 協力 Block 7 指標 harness。
-**一句話**：把課程 Program 1/2 架起來產生「待驗證答案」，再實作四個對照 baseline，讓 M-Gate 有東西可驗、有對手可比。
+**一句話**：把課程 Program 1/2 架起來產生「待驗證答案」，再實作四個對照 baseline，讓 吳-Gate 有東西可驗、有對手可比。
 
 ---
 
@@ -18,21 +18,21 @@
 > 🔴 今天=11/20，Block1-2 目標日 10/27–10/30 應已完成，請核對；baselines 若未齊是目前最可能的 critical path。
 
 1. **[Block 1, 10/27] Program 1**：建 embedding index（課程向量庫+FAISS），語料=打工權益 KB。跑通檢索 top-k。
-2. **[Block 1-2, 10/30] Program 2 + AnswerBundle**：cited QA 生成帶 citation 的答案 → **嚴格輸出 `AnswerBundle` schema**（M-Gate 10/24 定）。
+2. **[Block 1-2, 10/30] Program 2 + AnswerBundle**：cited QA 生成帶 citation 的答案 → **嚴格輸出 `AnswerBundle` schema**（吳-Gate 10/24 定）。
    - 不變式：每 citation 的 `doc_id` 存在於語料庫、`span_*` 落在 doc 長度內。
-   - 驗收：JSON Schema draft2020-12 validate 過；存 **5 筆 example** 進 repo（M-Gate 開發要吃）。
+   - 驗收：JSON Schema draft2020-12 validate 過；存 **5 筆 example** 進 repo（吳-Gate 開發要吃）。
 3. **[Block 5 baselines] 四個對照 scorer（同 interface）**：
    - **presence-only**：Program 2 自帶的「有沒有引」→ 下限對照。
    - **RAGAS**（LLM-judge, groq）：🔴 決定性=否，隔離為對照組，專門展示 variance>0 / cost>0。
    - **NLI-TRUE**（cross-encoder entailment）：決定性、非 LLM，entailment 強於 cosine 的對照。
    - **SelfCheckGPT**：取樣一致性法，另一條 LLM-based 對照。
    - 驗收：四者吃同一 `AlignedClaim`、吐同一 `ScorerResult`（含 latency_ms / cost_usd）。
-4. **[Block 7 協力] 指標 harness 骨架**：和 M-Gate 對齊 `{f1, precision, recall, cohen_kappa, determinism_var, cost_per_claim}` 的計算；cost 計費加總由本模組接 API 計量最準。
+4. **[Block 7 協力] 指標 harness 骨架**：和 吳-Gate 對齊 `{f1, precision, recall, cohen_kappa, determinism_var, cost_per_claim}` 的計算；cost 計費加總由本模組接 API 計量最準。
 
 ---
 
 ## 範例結果（「做完長這樣」）
-**Program 2 輸出一筆 `AnswerBundle`**（= 上游給 M-Gate 的契約）：
+**Program 2 輸出一筆 `AnswerBundle`**（= 上游給 吳-Gate 的契約）：
 ```json
 { "question": "試用期可以不給勞保嗎？",
   "answer": "試用期仍屬勞動契約，雇主應依法加保勞保。",
@@ -58,6 +58,6 @@ SelfCheckGPT   0.77   1200        0.006     var>0
 - [ ] 與 Emma 對齊 harness 的 metric 計算口徑一致。
 
 ## 依賴
-- **上游**：課程 Program 1/2 原始碼（`_repo/`）、M-Survey 的語料（RAGTruth/ALCE）。
-- **下游**：M-Gate（吃本模組的 `AnswerBundle` + baselines 做統一量測）。
-- 🔴 **本模組是目前最可能的瓶頸**：M-Gate 等本模組的 5 筆 example 才能端到端測。**AnswerBundle 契約一鎖死就先丟 5 筆過去**，baselines 可並行補。
+- **上游**：課程 Program 1/2 原始碼（`_repo/`）、艾-Survey 的語料（RAGTruth/ALCE）。
+- **下游**：吳-Gate（吃本模組的 `AnswerBundle` + baselines 做統一量測）。
+- 🔴 **本模組是目前最可能的瓶頸**：吳-Gate 等本模組的 5 筆 example 才能端到端測。**AnswerBundle 契約一鎖死就先丟 5 筆過去**，baselines 可並行補。

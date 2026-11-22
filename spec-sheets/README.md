@@ -17,10 +17,10 @@
 ## 四人分工（對齊公開版 §6，權威）
 | 代號 | 角色（公開版用字）| 一句話交付 |
 |---|---|---|
-| **M-Gate** | Verification-layer 整合 | HW1 語言ID前濾 + claim 切分 + citation 對齊 + 把**已發表 scorer**(embedding/NLI/HW1 self-attention)接到共同 harness |
-| **M-RAG** | RAG base + baselines | 架 Program1/2 + 載資料集 + 跑 LLM-judge(RAGAS)與既有 baselines |
-| **M-Analysis** | Analysis + Writing | accuracy/cost/reproducibility 比較 + **採用建議** + 圖表 + final report |
-| **M-Survey** | Survey + Data | 已發表技術綜述(RAGAS/FActScore/NLI/VeriScore/RAGTruth/Face4RAG) + 語料策展 + 可重現釋出 |
+| **吳-Gate** | Verification-layer 整合 | HW1 語言ID前濾 + claim 切分 + citation 對齊 + 把**已發表 scorer**(embedding/NLI/HW1 self-attention)接到共同 harness |
+| **曾-RAG** | RAG base + baselines | 架 Program1/2 + 載資料集 + 跑 LLM-judge(RAGAS)與既有 baselines |
+| **許-Analysis** | Analysis + Writing | accuracy/cost/reproducibility 比較 + **採用建議** + 圖表 + final report |
+| **艾-Survey** | Survey + Data | 已發表技術綜述(RAGAS/FActScore/NLI/VeriScore/RAGTruth/Face4RAG) + 語料策展 + 可重現釋出 |
 
 ## 檔案
 - [`01-gate.md`](01-emma-gate.md) — M-Gate / verification-layer 整合
@@ -31,12 +31,12 @@
 
 ## 整合點（誰等誰）
 ```
-M-Survey(綜述+凍結子集) ──┐
-M-RAG(Program1-2 AnswerBundle)──→ M-Gate(整合層:切分/對齊/接 scorer/harness) ──→ M-Analysis(比較+採用建議+report)
-                                        ↑
-                          M-RAG(已發表 baselines 同 interface)
+艾-Survey(綜述+凍結子集) ──┐
+曾-RAG(Program1-2 AnswerBundle)──→ 吳-Gate(整合層:切分/對齊/接 scorer/harness) ──→ 許-Analysis(比較+採用建議+report)
+                                         ↑
+                           曾-RAG(已發表 baselines 同 interface)
 ```
-🔴 **契約先定死再並行**：`schemas/claim_citation.schema.json`、`schemas/scorer_return.schema.json`（M-Gate 已定稿）是跨人交界，break 要 bump version + review。
+🔴 **契約先定死再並行**：`schemas/claim_citation.schema.json`、`schemas/scorer_return.schema.json`（吳-Gate 已定稿）是跨人交界，break 要 bump version + review。
 
 ## ⚠️ 合規紅線（公開版必守）
 - 報告/投影片/demo **不得宣稱任何方法是作者 novel 貢獻**（PASS/WARN/FAIL/UNSOURCED 判定與 determinism 都講成「評估框架 / 被量測的性質」，不是「我們發明的」）。

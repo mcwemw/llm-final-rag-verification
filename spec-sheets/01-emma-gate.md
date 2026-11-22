@@ -1,4 +1,4 @@
-# 分工規格書 ① — M-Gate
+# 分工規格書 ① — 吳-Gate
 ## 角色：Verification-Layer 整合（公開 eval 版）
 
 **負責 Block**：3 Claim Segmentation · 4 Claim↔Source Alignment · 5 Grounding Scorer 整合（把**已發表 scorer** 接到統一 interface）· 6 Verdict 判定框架 · 7 Metric Harness。
@@ -26,7 +26,7 @@
    - 驗收：explicit/nearest/none 三路徑各有測例。
 4. **[Block 5] 接已發表 scorer（統一 interface `scorer.score(claim, cited_docs)->ScorerResult`）**：
    - embedding-similarity（bge-m3，本機 CPU、normalize、batch16）
-   - NLI entailment（cross-encoder，M-RAG 或本模組接）
+   - NLI entailment（cross-encoder，曾-RAG 或本模組接）
    - 課程 HW1 self-attention 相似度 regressor
    - 驗收：embedding scorer 同輸入 3 次 score variance=0。
 5. **[Block 6, 校準 11/17→凍結 11/29] Verdict 判定框架**：在 Noa 凍結子集上 per-scorer 校準 `(lo,hi)`（max-F1/PR），校準後凍結寫檔。
@@ -38,7 +38,7 @@
 ---
 
 ## 範例結果（「做完長這樣」）
-**輸入**（M-RAG Block2 `AnswerBundle`）：
+**輸入**（曾-RAG Block2 `AnswerBundle`）：
 ```json
 { "question": "勞工加班費如何計算？",
   "answer": "平日延長工時前兩小時加給三分之一。雇主得片面取消特休。",
@@ -71,5 +71,5 @@ Self-attn (HW1)        TBD    TBD    0            no judge calls
 - [ ] 能脫稿講「我們評估/整合這些已發表技術」（demo 會問，**不要說成自己發明**）。
 
 ## 依賴
-- **上游**：M-RAG Block1-2（`AnswerBundle`）、M-Survey（凍結校準子集 + gold verdict）。
-- **下游**：M-Analysis（吃本模組的比較表做 accuracy/cost/reproducibility 分析 + 採用建議）。
+- **上游**：曾-RAG Block1-2（`AnswerBundle`）、艾-Survey（凍結校準子集 + gold verdict）。
+- **下游**：許-Analysis（吃本模組的比較表做 accuracy/cost/reproducibility 分析 + 採用建議）。
