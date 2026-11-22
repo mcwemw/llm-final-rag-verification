@@ -17,7 +17,7 @@
 ## 完成順序步驟（含目標日 / 依賴）
 > 🔴 今天=11/20，本模組的 11/03–11/12 里程碑應已完成（吳-Gate 的門檻校準 11/17 等本模組的凍結子集）——請確認凍結子集已交付，否則是全組 critical path。
 
-1. **[11/03] 載入 RAGTruth**：`response.jsonl` + `source_info.jsonl`，切 QA split，固定 `SEED=20261021`。
+1. **[11/03] 載入 RAGTruth**：從 `ParticleMedia/RAGTruth`（`github.com/ParticleMedia/RAGTruth`，MIT License，可商用）下載 `dataset/response.jsonl`（21MB）+ `dataset/source_info.jsonl`（15MB），切 QA split，固定 `SEED=20261021`。
 2. **[文獻回顧] faithfulness-verification 綜述**：RAGAS / FActScore / NLI-based / VeriScore / RAGTruth / FaithBench / Face4RAG。
    - 每篇一律附**授權欄（CC 別 + 可否商用）**（組規紀律）。
    - 收斂成一句定位：「這些方法 X/Y/Z，**但都沒把 determinism 當指標**」。
@@ -41,7 +41,7 @@ gold 分布:  PASS 712 / WARN 0* / FAIL 318 / UNSOURCED 157
 技術(published)  粒度      裁判         有報 determinism?   授權
 RAGAS           claim    LLM-judge     ✗                  Apache-2.0(可商用)
 NLI (TRUE)      claim    cross-encoder 多半未報            查
-RAGTruth        span     人工benchmark  ✗                 CC BY (查)
+RAGTruth        span     人工benchmark  ✗                 MIT ✅(可商用)
 embedding(bge-m3) claim  cosine        ✗(但本質 variance=0) MIT
 ```
 → 重點 = **「determinism 很少被一起報」是文獻現況**，本研究把這些技術放同一 harness 補量這一軸（評估，不是發明）。
