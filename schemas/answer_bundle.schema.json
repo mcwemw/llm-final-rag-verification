@@ -2,7 +2,8 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "answer_bundle.schema.json",
   "title": "AnswerBundle",
-  "description": "Block 1 -> Block 3 interface. Output of the RAG QA system (Program 2).",
+  "version": "1.1",
+  "description": "Block 1 -> Block 3 interface. Output of the RAG QA system (Program 2). v1.1: adds optional `retrieved` (all retrieved passages D), backward compatible with v1.0.",
   "type": "object",
   "required": ["question", "answer", "citations"],
   "additionalProperties": false,
@@ -19,6 +20,19 @@
           "doc_id": { "type": "string", "minLength": 1 },
           "span_start": { "type": "integer", "minimum": 0 },
           "span_end": { "type": "integer", "minimum": 0 },
+          "text": { "type": "string" }
+        }
+      }
+    },
+    "retrieved": {
+      "type": "array",
+      "description": "Optional (v1.1). All passages D returned by the retriever, cited or not; used for `nearest` alignment and WARN decisions.",
+      "items": {
+        "type": "object",
+        "required": ["doc_id", "text"],
+        "additionalProperties": false,
+        "properties": {
+          "doc_id": { "type": "string", "minLength": 1 },
           "text": { "type": "string" }
         }
       }
