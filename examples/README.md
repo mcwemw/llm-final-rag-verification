@@ -44,5 +44,5 @@ Source: RAGTruth QA subset (MS MARCO questions), **train split only** (no test l
 ## Regenerate
 ```bash
 # fetch data first (see ../data/README.md)
-python3 scripts/make_answer_bundle_examples.py --n 5 --seed 0
+python3 tools/generate_examples.py --n 5 --seed 0
 ```

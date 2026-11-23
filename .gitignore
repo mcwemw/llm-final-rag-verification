@@ -1,5 +1,7 @@
 # Belt-and-suspenders: keep research-grade code, data, and internal notes OUT of this public repo.
 *.py
+# ...except reproducibility tools (e.g. tools/generate_examples.py), which must be tracked.
+!tools/*.py
 faithfulness-gate/
 research-connection.md
 STATUS.md
