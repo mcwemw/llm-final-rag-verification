@@ -1,0 +1,69 @@
+{
+  "answer_bundle_01": {
+    "ragtruth_response_id": "13772",
+    "ragtruth_source_id": "15215",
+    "model": "mistral-7B-instruct",
+    "split": "train",
+    "hallucinated": false,
+    "labels": []
+  },
+  "answer_bundle_02": {
+    "ragtruth_response_id": "14016",
+    "ragtruth_source_id": "15256",
+    "model": "gpt-4-0613",
+    "split": "train",
+    "hallucinated": false,
+    "labels": []
+  },
+  "answer_bundle_03": {
+    "ragtruth_response_id": "13706",
+    "ragtruth_source_id": "15204",
+    "model": "mistral-7B-instruct",
+    "split": "train",
+    "hallucinated": true,
+    "labels": [
+      {
+        "start": 361,
+        "end": 398,
+        "text": "while the Kindle Paperwhite does not.",
+        "label_type": "Evident Conflict"
+      }
+    ]
+  },
+  "answer_bundle_04": {
+    "ragtruth_response_id": "13259",
+    "ragtruth_source_id": "15128",
+    "model": "llama-2-70b-chat",
+    "split": "train",
+    "hallucinated": true,
+    "labels": [
+      {
+        "start": 564,
+        "end": 757,
+        "text": "It's important to note that harvesting pine nuts in BC may require additional permits or permissions, so it's essential to check with local authorities before starting any harvesting activities",
+        "label_type": "Evident Baseless Info"
+      }
+    ]
+  },
+  "answer_bundle_05": {
+    "ragtruth_response_id": "14884",
+    "ragtruth_source_id": "15401",
+    "model": "llama-2-13b-chat",
+    "split": "train",
+    "hallucinated": true,
+    "labels": [
+      {
+        "start": 129,
+        "end": 166,
+        "text": "ATVs have a single-seat configuration",
+        "label_type": "Subtle Baseless Info"
+      },
+      {
+        "start": 418,
+        "end": 468,
+        "text": "UTVs provide a smoother and more comfortable ride.",
+        "label_type": "Subtle Baseless Info"
+      }
+    ]
+  }
+}
