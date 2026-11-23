@@ -1,4 +1,5 @@
 {
+  "schema_version": "1.1",
   "question": "roth account withdrawal rules",
   "answer": "Based on the given passages, here is a brief summary of the Roth IRA withdrawal rules:\n\n1. Contributions to a Roth IRA are not tax-deductible.\n2. Qualified distributions from a Roth IRA are tax-free.\n3. Roth IRA accounts must be designated as such at setup.\n4. Age limits do not apply to Roth IRA contributions.\n5. Earnings from a Roth IRA can be withdrawn without taxes after 5 years and at age 59 ½ or later, as long as certain conditions are met.\n6. If the earnings are used to pay for a first-time home purchase, they are tax-free.\n7. Withdrawal of earnings before age 59 ½ and less than 5 years may be subject to taxes and penalties.",
   "citations": [

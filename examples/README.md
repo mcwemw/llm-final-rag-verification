@@ -23,6 +23,18 @@ Source: RAGTruth QA subset (MS MARCO questions), **train split only** (no test l
   `span_start` / `span_end` index the original RAGTruth `source_info.passages` string
   (all passages concatenated, including the `passage N:` headers), so they do **not** start at 0
   for each passage. Invariant: `passages[span_start:span_end] == text`.
+- **Concat format / separator.** RAGTruth stores the context as one string:
+  ```
+  "passage 1:<text 1>\n\npassage 2:<text 2>\n\npassage 3:<text 3>\n\n"
+  ```
+  i.e. each passage is preceded by the header `passage N:` (10 chars for N < 10) and
+  passages are separated by `\n\n` (2 chars). Citation spans cover only the passage text
+  (headers and surrounding whitespace excluded). So the gap between consecutive spans is
+  `"\n\npassage N:"` = **12 chars**, e.g. `answer_bundle_01`: p1 ends at 644, p2 starts at 656
+  (`passages[644:656] == "\n\npassage 2:"`), p3 starts at 1204 = 1192 + 12.
+  Verified on all 989 RAGTruth QA contexts: separator is always `\n\n`.
+- `schema_version` is set to `"1.1"` in every bundle (optional field in the schema, so older
+  v1.0 bundles without it still validate).
 - `retrieved` (schema v1.1) lists all retrieved passages D as `{doc_id, text}`.
   For RAGTruth it is identical to `citations` (every retrieved passage is cited); for the
   course Program 2 demo it will also contain retrieved-but-uncited passages.

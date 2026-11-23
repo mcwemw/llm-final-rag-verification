@@ -3,11 +3,16 @@
   "$id": "answer_bundle.schema.json",
   "title": "AnswerBundle",
   "version": "1.1",
-  "description": "Block 1 -> Block 3 interface. Output of the RAG QA system (Program 2). v1.1: adds optional `retrieved` (all retrieved passages D), backward compatible with v1.0.",
+  "description": "Block 1 -> Block 3 interface. Output of the RAG QA system (Program 2). v1.1: adds optional `retrieved` (all retrieved passages D) and optional `schema_version`; backward compatible with v1.0.",
   "type": "object",
   "required": ["question", "answer", "citations"],
   "additionalProperties": false,
   "properties": {
+    "schema_version": {
+      "type": "string",
+      "enum": ["1.0", "1.1"],
+      "description": "Version of this contract the bundle was produced against. Optional for backward compatibility; producers should set it (current: \"1.1\")."
+    },
     "question": { "type": "string", "minLength": 1 },
     "answer": { "type": "string", "minLength": 1 },
     "citations": {
