@@ -26,3 +26,8 @@ context (the real RAG setting).
 `labels` is the list of human-annotated hallucination spans; **empty list =
 faithful**, non-empty = hallucinated. We use this at the response level:
 `y_true = 1 if labels else 0`.
+
+## Preprocessing note (RAGTruth → AnswerBundle)
+RAGTruth responses have no inline citation markers, so **every retrieved passage is treated
+as cited** and claims are bound to sources with **`nearest` alignment**. Span offsets index the
+full `source_info.passages` string; see [`../examples/README.md`](../examples/README.md).

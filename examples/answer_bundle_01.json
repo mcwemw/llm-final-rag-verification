@@ -1,0 +1,39 @@
+{
+  "schema_version": "1.1",
+  "question": "roth account withdrawal rules",
+  "answer": "Based on the given passages, here is a brief summary of the Roth IRA withdrawal rules:\n\n1. Contributions to a Roth IRA are not tax-deductible.\n2. Qualified distributions from a Roth IRA are tax-free.\n3. Roth IRA accounts must be designated as such at setup.\n4. Age limits do not apply to Roth IRA contributions.\n5. Earnings from a Roth IRA can be withdrawn without taxes after 5 years and at age 59 ½ or later, as long as certain conditions are met.\n6. If the earnings are used to pay for a first-time home purchase, they are tax-free.\n7. Withdrawal of earnings before age 59 ½ and less than 5 years may be subject to taxes and penalties.",
+  "citations": [
+    {
+      "doc_id": "ragtruth-15215-p1",
+      "span_start": 10,
+      "span_end": 644,
+      "text": "A Roth IRA is an IRA that, except as explained below, is subject to the rules that apply to a traditional IRA. You cannot deduct contributions to a Roth IRA. If you satisfy the requirements, qualified distributions are tax-free.You can make contributions to your Roth IRA after you reach age 70 ½.You can leave amounts in your Roth IRA as long as you live. The account or annuity must be designated as a Roth IRA when it is set up.ou can make contributions to your Roth IRA after you reach age 70 ½. You can leave amounts in your Roth IRA as long as you live. The account or annuity must be designated as a Roth IRA when it is set up."
+    },
+    {
+      "doc_id": "ragtruth-15215-p2",
+      "span_start": 656,
+      "span_end": 1192,
+      "text": "A Roth IRA is an individual retirement account that offers tax-free growth and tax-free withdrawals in retirement. Roth IRA rules dictate that as long as you've owned your account for 5 years* and you're age 59½ or older, you can withdraw your money when you want to and you won't owe any federal taxes.o age limit. Contributions to a Roth IRA don't have to stop when you reach age 70½, the cut-off for a traditional IRA. You can put money in your account for as many years as you want, as long as you have earned income that qualifies."
+    },
+    {
+      "doc_id": "ragtruth-15215-p3",
+      "span_start": 1204,
+      "span_end": 1647,
+      "text": "If you’re under age 59½ and your Roth IRA has been open five years or more, 1 your earnings will not be subject to taxes if you meet one of the following conditions: 1  You use the withdrawal (up to a $10,000 lifetime maximum) to pay for a first-time home purchase.oth IRA Withdrawal Rules. With a Roth IRA, contributions are not tax-deductible, but earnings can grow tax-free. Roth IRA withdrawal and penalty rules vary depending on your age."
+    }
+  ],
+  "retrieved": [
+    {
+      "doc_id": "ragtruth-15215-p1",
+      "text": "A Roth IRA is an IRA that, except as explained below, is subject to the rules that apply to a traditional IRA. You cannot deduct contributions to a Roth IRA. If you satisfy the requirements, qualified distributions are tax-free.You can make contributions to your Roth IRA after you reach age 70 ½.You can leave amounts in your Roth IRA as long as you live. The account or annuity must be designated as a Roth IRA when it is set up.ou can make contributions to your Roth IRA after you reach age 70 ½. You can leave amounts in your Roth IRA as long as you live. The account or annuity must be designated as a Roth IRA when it is set up."
+    },
+    {
+      "doc_id": "ragtruth-15215-p2",
+      "text": "A Roth IRA is an individual retirement account that offers tax-free growth and tax-free withdrawals in retirement. Roth IRA rules dictate that as long as you've owned your account for 5 years* and you're age 59½ or older, you can withdraw your money when you want to and you won't owe any federal taxes.o age limit. Contributions to a Roth IRA don't have to stop when you reach age 70½, the cut-off for a traditional IRA. You can put money in your account for as many years as you want, as long as you have earned income that qualifies."
+    },
+    {
+      "doc_id": "ragtruth-15215-p3",
+      "text": "If you’re under age 59½ and your Roth IRA has been open five years or more, 1 your earnings will not be subject to taxes if you meet one of the following conditions: 1  You use the withdrawal (up to a $10,000 lifetime maximum) to pay for a first-time home purchase.oth IRA Withdrawal Rules. With a Roth IRA, contributions are not tax-deductible, but earnings can grow tax-free. Roth IRA withdrawal and penalty rules vary depending on your age."
+    }
+  ]
+}

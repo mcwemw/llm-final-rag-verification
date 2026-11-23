@@ -1,0 +1,39 @@
+{
+  "schema_version": "1.1",
+  "question": "hot do you harvest pine nuts in bc",
+  "answer": "Based on the given passages, here's how you can harvest pine nuts in BC:\n\n1. Find stands of appropriate pine species on privately owned land, get the owner's permission, or find wild stands of native, nut-bearing pines on land where it's legal to harvest.\n2. Check if the pine cones have opened on the tree and still contain the seeds. If they have, place a tarp under the area you intend to harvest.\n3. Using a ladder, get close to the pine cones and knock the cones with a stick. The seeds should fall on the tarp.\n4. Gather the seeds into cloth or paper bags.\n\nIt's important to note that harvesting pine nuts in BC may require additional permits or permissions, so it's essential to check with local authorities before starting any harvesting activities.",
+  "citations": [
+    {
+      "doc_id": "ragtruth-15128-p1",
+      "span_start": 10,
+      "span_end": 552,
+      "text": "Grow your own pines, or find stands of appropriate pine species on privately owned land -- get the owner's permission before you harvest -- or find wild stands of native, nut-bearing pines on land where it's legal to harvest.f the pine cones have opened on the tree and still contain the seeds, which you can see between the open cone bracts, put a tarp under the area you intend to harvest. Using a ladder, get close to the pine cones and knock the cones with a stick. The seeds should fall on the tarp. Gather them into cloth or paper bags."
+    },
+    {
+      "doc_id": "ragtruth-15128-p2",
+      "span_start": 564,
+      "span_end": 926,
+      "text": "John from http://www.okraw.com/ shares with you how you can harvest wild grown pine nuts in the forest.In this episode, John takes you to the Mount Charleston 40 minutes outside Las Vegas, Nevada to harvest his own raw in-shell pine nuts fresh from the forest.ohn from http://www.okraw.com/ shares with you how you can harvest wild grown pine nuts in the forest."
+    },
+    {
+      "doc_id": "ragtruth-15128-p3",
+      "span_start": 938,
+      "span_end": 1496,
+      "text": "Step 1. Harvest pine nuts in the late summer to late fall. This is when the pine cones are ready to be picked. If the pine cone is open, the nuts can be shaken out of the pine cone immediately.If the pine cone is closed you must open it before you can remove the nuts.Harvest both open and closed pine cones.his is when the pine cones are ready to be picked. If the pine cone is open, the nuts can be shaken out of the pine cone immediately. If the pine cone is closed you must open it before you can remove the nuts. Harvest both open and closed pine cones."
+    }
+  ],
+  "retrieved": [
+    {
+      "doc_id": "ragtruth-15128-p1",
+      "text": "Grow your own pines, or find stands of appropriate pine species on privately owned land -- get the owner's permission before you harvest -- or find wild stands of native, nut-bearing pines on land where it's legal to harvest.f the pine cones have opened on the tree and still contain the seeds, which you can see between the open cone bracts, put a tarp under the area you intend to harvest. Using a ladder, get close to the pine cones and knock the cones with a stick. The seeds should fall on the tarp. Gather them into cloth or paper bags."
+    },
+    {
+      "doc_id": "ragtruth-15128-p2",
+      "text": "John from http://www.okraw.com/ shares with you how you can harvest wild grown pine nuts in the forest.In this episode, John takes you to the Mount Charleston 40 minutes outside Las Vegas, Nevada to harvest his own raw in-shell pine nuts fresh from the forest.ohn from http://www.okraw.com/ shares with you how you can harvest wild grown pine nuts in the forest."
+    },
+    {
+      "doc_id": "ragtruth-15128-p3",
+      "text": "Step 1. Harvest pine nuts in the late summer to late fall. This is when the pine cones are ready to be picked. If the pine cone is open, the nuts can be shaken out of the pine cone immediately.If the pine cone is closed you must open it before you can remove the nuts.Harvest both open and closed pine cones.his is when the pine cones are ready to be picked. If the pine cone is open, the nuts can be shaken out of the pine cone immediately. If the pine cone is closed you must open it before you can remove the nuts. Harvest both open and closed pine cones."
+    }
+  ]
+}
