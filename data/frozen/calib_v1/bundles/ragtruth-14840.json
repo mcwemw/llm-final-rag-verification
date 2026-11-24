@@ -1,0 +1,39 @@
+{
+  "schema_version": "1.1",
+  "question": "how to prepare to get an ultrasound",
+  "answer": "To prepare for an ultrasound, you should consult with your healthcare provider about any specific instructions they have regarding the type of ultrasound you will be having. In general, most ultrasound exams require little to no preparation. However, if you are having a gallbladder ultrasound, you may need to fast for up to 6 hours before the exam. If you are having a pelvic ultrasound, you may need to drink up to six glasses of water two hours before the exam and not urinate until the exam is completed. It's important to follow your healthcare provider's instructions carefully to ensure the accuracy and effectiveness of the ultrasound.",
+  "citations": [
+    {
+      "doc_id": "ragtruth-15394-p1",
+      "span_start": 10,
+      "span_end": 335,
+      "text": "1 If you are just interested in checking the gender, you can go as early as 17 weeks. 2  Any earlier, and the results may not be accurate, leading to an extra coat of paint for your bedroom. 3  To get good pictures, 3D ultrasounds are best performed between 20 and 32 weeks, and the best pictures are between 24 and 30 weeks."
+    },
+    {
+      "doc_id": "ragtruth-15394-p2",
+      "span_start": 347,
+      "span_end": 554,
+      "text": "Most ultrasound exams require no preparation, with a few exceptions: 1  For some ultrasound exams, such as of the gallbladder, your doctor may ask that you not eat or drink for up to 6 hours before the exam."
+    },
+    {
+      "doc_id": "ragtruth-15394-p3",
+      "span_start": 566,
+      "span_end": 778,
+      "text": "1 Other ultrasound exams, such as of the pelvis, may require a full bladder, so your doctor might ask you to drink up to six glasses of water two hours before the exam and not urinate until the exam is completed."
+    }
+  ],
+  "retrieved": [
+    {
+      "doc_id": "ragtruth-15394-p1",
+      "text": "1 If you are just interested in checking the gender, you can go as early as 17 weeks. 2  Any earlier, and the results may not be accurate, leading to an extra coat of paint for your bedroom. 3  To get good pictures, 3D ultrasounds are best performed between 20 and 32 weeks, and the best pictures are between 24 and 30 weeks."
+    },
+    {
+      "doc_id": "ragtruth-15394-p2",
+      "text": "Most ultrasound exams require no preparation, with a few exceptions: 1  For some ultrasound exams, such as of the gallbladder, your doctor may ask that you not eat or drink for up to 6 hours before the exam."
+    },
+    {
+      "doc_id": "ragtruth-15394-p3",
+      "text": "1 Other ultrasound exams, such as of the pelvis, may require a full bladder, so your doctor might ask you to drink up to six glasses of water two hours before the exam and not urinate until the exam is completed."
+    }
+  ]
+}

@@ -1,0 +1,39 @@
+{
+  "schema_version": "1.1",
+  "question": "fan ramps up and down when I turn on desktop computer does not startup",
+  "answer": "Based on the given passages, it appears that the issue is related to the CPU fan not starting or stopping too early during bootup. The user has already taken steps to clean out the case, heat sink, and fan and reapply thermal paste. However, the problem persists. To troubleshoot further, the user can check the connections between the CPU fan and motherboard, and ensure that there are no loose cables or damaged components. Additionally, checking the temperature inside the case using a thermometer may provide insight into whether the fan is functioning properly or if there are any other issues that could be causing overheating.",
+  "citations": [
+    {
+      "doc_id": "ragtruth-15514-p1",
+      "span_start": 10,
+      "span_end": 663,
+      "text": "Specs: Vista Home, Dual Core P4/3gigs. Ok the subject just gives a little bit of info ill give you the rest. Basicly turn computer on, let it sit for a few and then it boots up. During pre and post fan revs up and down and blue power light flashes as the proc fan revs up and down. Heres what I did so far.I cleaned out case. Cleaned out heat sink, fan and reapplied thermal paste.asicly turn computer on, let it sit for a few and then it boots up. During pre and post fan revs up and down and blue power light flashes as the proc fan revs up and down. Heres what I did so far. I cleaned out case. Cleaned out heat sink, fan and reapplied thermal paste."
+    },
+    {
+      "doc_id": "ragtruth-15514-p2",
+      "span_start": 675,
+      "span_end": 1339,
+      "text": "To do so, put your ear to the case of the CPU. If you hear a humming noise, it almost certainly indicates that the fan is running. If, for some reason, the fan is not running, your CPU will overheat and the computer will refuse to turn on until the CPU cools down.If you smell acrid smoke, some component of your computer (mostly your motherboard) might have burnt out.It will need to be replaced.f, for some reason, the fan is not running, your CPU will overheat and the computer will refuse to turn on until the CPU cools down. If you smell acrid smoke, some component of your computer (mostly your motherboard) might have burnt out. It will need to be replaced."
+    },
+    {
+      "doc_id": "ragtruth-15514-p3",
+      "span_start": 1351,
+      "span_end": 2179,
+      "text": "Now when I try to boot it up, everything sounds like its working, but the monitor doesn't turn on and the fan starts spinning for 5 seconds, then stops. In bullet form: -Put computer in sleep. -Tried to wake up, screen did not turn on-Hard reset. -Try to boot up, screen does not turn on at all, HDD and fans spin up.-CPU fan then stops spinning after 5 seconds, screen still does not turn on. I've tried taking it apart and tried booting with the minimal parts (1 stick of RAM and the HDD) and that didn't work.ow when I try to boot it up, everything sounds like its working, but the monitor doesn't turn on and the fan starts spinning for 5 seconds, then stops. In bullet form: -Put computer in sleep. -Tried to wake up, screen did not turn on-Hard reset. -Try to boot up, screen does not turn on at all, HDD and fans spin up."
+    }
+  ],
+  "retrieved": [
+    {
+      "doc_id": "ragtruth-15514-p1",
+      "text": "Specs: Vista Home, Dual Core P4/3gigs. Ok the subject just gives a little bit of info ill give you the rest. Basicly turn computer on, let it sit for a few and then it boots up. During pre and post fan revs up and down and blue power light flashes as the proc fan revs up and down. Heres what I did so far.I cleaned out case. Cleaned out heat sink, fan and reapplied thermal paste.asicly turn computer on, let it sit for a few and then it boots up. During pre and post fan revs up and down and blue power light flashes as the proc fan revs up and down. Heres what I did so far. I cleaned out case. Cleaned out heat sink, fan and reapplied thermal paste."
+    },
+    {
+      "doc_id": "ragtruth-15514-p2",
+      "text": "To do so, put your ear to the case of the CPU. If you hear a humming noise, it almost certainly indicates that the fan is running. If, for some reason, the fan is not running, your CPU will overheat and the computer will refuse to turn on until the CPU cools down.If you smell acrid smoke, some component of your computer (mostly your motherboard) might have burnt out.It will need to be replaced.f, for some reason, the fan is not running, your CPU will overheat and the computer will refuse to turn on until the CPU cools down. If you smell acrid smoke, some component of your computer (mostly your motherboard) might have burnt out. It will need to be replaced."
+    },
+    {
+      "doc_id": "ragtruth-15514-p3",
+      "text": "Now when I try to boot it up, everything sounds like its working, but the monitor doesn't turn on and the fan starts spinning for 5 seconds, then stops. In bullet form: -Put computer in sleep. -Tried to wake up, screen did not turn on-Hard reset. -Try to boot up, screen does not turn on at all, HDD and fans spin up.-CPU fan then stops spinning after 5 seconds, screen still does not turn on. I've tried taking it apart and tried booting with the minimal parts (1 stick of RAM and the HDD) and that didn't work.ow when I try to boot it up, everything sounds like its working, but the monitor doesn't turn on and the fan starts spinning for 5 seconds, then stops. In bullet form: -Put computer in sleep. -Tried to wake up, screen did not turn on-Hard reset. -Try to boot up, screen does not turn on at all, HDD and fans spin up."
+    }
+  ]
+}
