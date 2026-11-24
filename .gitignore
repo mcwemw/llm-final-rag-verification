@@ -3,6 +3,9 @@
 # ...except reproducibility tools and block implementations (deliverables).
 !tools/*.py
 !blocks/*.py
+# Python bytecode caches (regenerated on every run)
+__pycache__/
+*.pyc
 faithfulness-gate/
 research-connection.md
 STATUS.md
