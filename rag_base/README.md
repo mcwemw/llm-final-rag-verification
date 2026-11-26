@@ -56,5 +56,6 @@ By default, Program 2 uses the course's prebuilt KB. Pass `--kb rag_base/out/kb/
 - The functions loaded from the notebooks give output identical to the earlier copied port. This was checked on all 16 documents and on 14 real Program 2 answers.
 
 ## Findings for the report
-- **The course's own presence-only check misses citations.** `citation_note()` only matches half-width `[doc_xxx]`, but `gpt-oss-120b` mostly writes full-width or other brackets (`【doc_xxx】`, `〔doc_xxx〕`, `（doc_xxx）`). In **13 of 14** answers that do cite documents, it reports "回答未附文件編號" (no citation attached). Only q18 used half-width brackets. Measured on 14 answers from 2026-11-27; 5 of the 19 questions were not generated because of Groq rate limits.
+- **The course's own presence-only check misses citations.** `citation_note()` only matches half-width `[doc_xxx]`, but `gpt-oss-120b` mostly writes full-width or other brackets (`【doc_xxx】`, `〔doc_xxx〕`, `（doc_xxx）`). All **19** answers to the course question set cite documents, yet `citation_note()` reports "回答未附文件編號" (no citation attached) for **17 of 19**. Measured 2026-11-27.
+- Refusals can also mention doc ids. For example, q17 ("這家店的店長叫什麼名字？") is correctly refused, but it names `(doc_004)` and others as the documents that do *not* contain the answer. The bundle export treats any mention as a citation.
 - The English Block 3/4 rules cannot segment or align these Chinese answers. See the `--lang zh` proposal in PR #4.
