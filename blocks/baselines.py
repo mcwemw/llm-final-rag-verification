@@ -6,7 +6,7 @@ Every baseline implements the locked Block 5 interface from `blocks.scorer`:
 Baselines here:
   * PresenceOnlyScorer — citation-presence check (Gao et al., 2023, ALCE); the "floor".
   * RagasScorer        — LLM-as-judge faithfulness (Es et al., 2024) via Groq; non-deterministic.
-  * (planned) SelfCheckGPTScorer — sampling consistency (Manakul et al., 2023); non-deterministic.
+  * SelfCheckGPTScorer — sampling consistency, NLI variant (Manakul et al., 2023); non-deterministic.
 """
 from __future__ import annotations
 
@@ -214,3 +214,204 @@ class RagasScorer:
     def close(self) -> None:
         if not self._loop.is_closed():
             self._loop.close()
+
+
+# ── SelfCheckGPTScorer ────────────────────────────────────────────────────────
+
+SC_NLI_MODEL = "potsawee/deberta-v3-large-mnli"  # NLIConfig.nli_model in the official selfcheckgpt package
+
+# RAGTruth QA generation prompt (verbatim template from RAGTruth source_info.jsonl `prompt`),
+# so the stochastic samples are drawn under the same conditions as the response being checked.
+RAGTRUTH_QA_PROMPT = (
+    "Briefly answer the following question:\n{question}\n"
+    "Bear in mind that your response should be strictly based on the following {n} passages:\n"
+    "{passages}"
+    "In case the passages do not contain the necessary information to answer the question, "
+    "please reply with: \"Unable to answer based on given passages.\"\noutput:"
+)
+_NUM_WORDS = ["zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten"]
+
+
+class SelfCheckGPTScorer:
+    """Baseline 3 — SelfCheckGPT, NLI variant (Manakul et al., 2023, EMNLP).
+
+    Idea: if the model really "knows" a fact, re-asking the same question gives answers that
+    agree with it; a hallucinated sentence tends to be contradicted by fresh samples.
+      1. sampling: ask the generator LLM the same question N more times (temperature 1.0);
+      2. NLI: for each sample, P(contradiction | claim, sample) with DeBERTa-v3-large-MNLI,
+         normalised over {entailment, contradiction} (the model's 2 labels);
+      3. hallucination score = mean over samples;  our score = 1 - that  (1 = consistent).
+    The NLI step re-implements `selfcheckgpt.SelfCheckNLI.predict` (MIT, v0.1.7): pair order
+    (sentence, sample), softmax, probs[1] = contradiction, mean over samples.
+
+    Samples are drawn once per response (same question + same passages) and shared by all its
+    claims, as in the paper. Call `reset_samples()` between Det-var reruns so every rerun draws
+    fresh samples — otherwise rerun variance would be faked to 0.
+
+    Cost: all N sampling calls of a response are charged to the claim that triggered them;
+    the other claims of that response report 0. Totals in `total_usage` / summed cost_usd are exact.
+
+    Interface gap (same as RAGAS): the question is set per bundle via `set_question()`. Without it
+    the prompt falls back to "(no question given)" and `n_fallback_question` is incremented.
+    """
+
+    name = "selfcheckgpt-nli"
+
+    def __init__(
+        self,
+        model: str | None = None,
+        api_key: str | None = None,
+        n_samples: int = 3,
+        temperature: float = 1.0,
+        reasoning_effort: str | None = "low",
+        max_completion_tokens: int = 2048,
+        price_in_per_mtok: float | None = None,
+        price_out_per_mtok: float | None = None,
+        nli_model: str = SC_NLI_MODEL,
+        device: str | None = None,
+        max_retries: int = 6,
+        client: Any = None,
+        nli: Any = None,
+    ) -> None:
+        if n_samples < 1:
+            raise ValueError("n_samples must be >= 1")
+        self.model = model or os.environ.get("GROQ_MODEL", DEFAULT_GROQ_MODEL)
+        self.n_samples = n_samples
+        self.temperature = temperature
+        self.reasoning_effort = reasoning_effort
+        self.max_completion_tokens = max_completion_tokens
+        self.price_in = price_in_per_mtok
+        self.price_out = price_out_per_mtok
+        self.nli_model = nli_model
+        self.question: str | None = None
+        self.n_fallback_question = 0
+        self.n_empty_samples = 0
+        self.total_usage = {"prompt_tokens": 0, "completion_tokens": 0, "calls": 0}
+        self._samples_cache: dict[tuple, list[str]] = {}
+
+        if price_in_per_mtok is None or price_out_per_mtok is None:
+            warnings.warn(
+                "SelfCheckGPTScorer: Groq prices not set -> cost_usd reported as 0.0. Token counts "
+                "are still recorded in total_usage.", stacklevel=2,
+            )
+
+        if client is None:
+            from openai import OpenAI
+            key = api_key or os.environ.get("GROQ_API_KEY")
+            if not key:
+                raise RuntimeError(
+                    "GROQ_API_KEY is not set. Run `export GROQ_API_KEY=gsk_...` first "
+                    "(never commit the key)."
+                )
+            client = OpenAI(api_key=key, base_url=GROQ_BASE_URL, max_retries=max_retries)
+        self._client = client
+
+        # nli: callable(list[(claim, sample)]) -> list[P(contradiction)]; injectable for tests.
+        self._nli = nli if nli is not None else self._load_nli(nli_model, device)
+
+    # -- NLI (DeBERTa-v3-large-MNLI, local, deterministic) ---------------------
+    @staticmethod
+    def _load_nli(model_name: str, device: str | None):
+        import torch
+        from transformers import AutoModelForSequenceClassification, AutoTokenizer
+
+        dev = device or ("cuda" if torch.cuda.is_available() else "cpu")
+        tok = AutoTokenizer.from_pretrained(model_name)
+        mdl = AutoModelForSequenceClassification.from_pretrained(model_name).to(dev).eval()
+
+        @torch.no_grad()
+        def contradiction_probs(pairs: list[tuple[str, str]]) -> list[float]:
+            out = []
+            for sentence, sample in pairs:  # one pair at a time, exactly like SelfCheckNLI.predict
+                enc = tok([(sentence, sample)], add_special_tokens=True, padding="longest",
+                          truncation=True, return_tensors="pt",
+                          return_token_type_ids=True, return_attention_mask=True).to(dev)
+                probs = torch.softmax(mdl(**enc).logits, dim=-1)
+                out.append(float(probs[0][1].item()))  # prob(contradiction)
+            return out
+
+        return contradiction_probs
+
+    # -- sampling -------------------------------------------------------------
+    def _prompt(self, question: str, cited_docs: list[dict]) -> str:
+        texts = [d.get("text", "") for d in cited_docs]
+        n = len(texts)
+        passages = "".join(f"passage {i}:{t}\n\n" for i, t in enumerate(texts, 1))
+        return RAGTRUTH_QA_PROMPT.format(
+            question=question, n=_NUM_WORDS[n] if n < len(_NUM_WORDS) else str(n), passages=passages)
+
+    def _draw_samples(self, prompt: str) -> tuple[list[str], int, int]:
+        samples, p_tok, c_tok = [], 0, 0
+        extra = {"max_completion_tokens": self.max_completion_tokens}
+        if self.reasoning_effort:
+            extra["reasoning_effort"] = self.reasoning_effort
+        for _ in range(self.n_samples):
+            resp = self._client.chat.completions.create(
+                model=self.model, messages=[{"role": "user", "content": prompt}],
+                temperature=self.temperature, **extra)
+            self.total_usage["calls"] += 1
+            usage = getattr(resp, "usage", None)
+            if usage is not None:
+                p_tok += getattr(usage, "prompt_tokens", 0) or 0
+                c_tok += getattr(usage, "completion_tokens", 0) or 0
+            text = (resp.choices[0].message.content or "").strip()
+            if text:
+                samples.append(text)
+            else:  # e.g. reasoning used up the token budget; drop it but count it
+                self.n_empty_samples += 1
+        self.total_usage["prompt_tokens"] += p_tok
+        self.total_usage["completion_tokens"] += c_tok
+        return samples, p_tok, c_tok
+
+    def _cost(self, p_tok: int, c_tok: int) -> float:
+        if self.price_in is None or self.price_out is None:
+            return 0.0
+        return (p_tok * self.price_in + c_tok * self.price_out) / 1e6
+
+    # -- interface ------------------------------------------------------------
+    def set_question(self, question: str | None) -> None:
+        """Set the original question of the bundle being scored."""
+        self.question = question
+
+    def reset_samples(self) -> None:
+        """Forget drawn samples; call between Det-var reruns so each rerun resamples."""
+        self._samples_cache.clear()
+
+    @property
+    def config(self) -> dict:
+        return {"method": self.name, "model": self.model, "n_samples": self.n_samples,
+                "temperature": self.temperature, "reasoning_effort": self.reasoning_effort,
+                "max_completion_tokens": self.max_completion_tokens, "nli_model": self.nli_model,
+                "price_in_per_mtok": self.price_in, "price_out_per_mtok": self.price_out}
+
+    def score(self, claim: AlignedClaim, cited_docs: list[dict]) -> ScorerResult:
+        t0 = time.perf_counter()
+        cid = _claim_id(claim)
+
+        if not cited_docs or claim.alignment == "none" or not claim.claim_text:
+            return ScorerResult(claim_id=cid, method=self.name, score=0.0,
+                                latency_ms=(time.perf_counter() - t0) * 1000,
+                                cost_usd=0.0, deterministic=False)
+
+        question = self.question
+        if not question:
+            question = "(no question given)"
+            self.n_fallback_question += 1
+
+        key = (question, tuple(d.get("text", "") for d in cited_docs))
+        cost = 0.0
+        if key not in self._samples_cache:
+            samples, p_tok, c_tok = self._draw_samples(self._prompt(question, cited_docs))
+            self._samples_cache[key] = samples
+            cost = self._cost(p_tok, c_tok)
+        samples = self._samples_cache[key]
+
+        if not samples:  # every sample came back empty -> nothing to compare against
+            value = 0.0
+        else:
+            contra = self._nli([(claim.claim_text, s) for s in samples])
+            value = 1.0 - sum(contra) / len(contra)
+        return ScorerResult(claim_id=cid, method=self.name,
+                            score=max(0.0, min(1.0, value)),
+                            latency_ms=(time.perf_counter() - t0) * 1000,
+                            cost_usd=cost, deterministic=False)

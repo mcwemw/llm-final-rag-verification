@@ -195,3 +195,135 @@ class TestRagasScorer:
         monkeypatch.delenv("GROQ_API_KEY", raising=False)
         with pytest.raises(RuntimeError, match="GROQ_API_KEY"):
             RagasScorer(price_in_per_mtok=0, price_out_per_mtok=0)
+
+
+# ── SelfCheckGPTScorer — offline tests (fake Groq + fake NLI, no key / GPU) ───
+
+from blocks.baselines import SelfCheckGPTScorer  # noqa: E402
+
+
+def _fake_sync_groq(samples, prompt_tokens=300, completion_tokens=50):
+    """Sync OpenAI client returning `samples` in turn (cycled) as chat completions."""
+    from openai import OpenAI
+    calls = {"n": 0, "bodies": []}
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        text = samples[calls["n"] % len(samples)]
+        calls["n"] += 1
+        calls["bodies"].append(json.loads(request.content))
+        return httpx.Response(200, json={
+            "id": "x", "object": "chat.completion", "created": 0, "model": "fake",
+            "choices": [{"index": 0, "finish_reason": "stop",
+                         "message": {"role": "assistant", "content": text}}],
+            "usage": {"prompt_tokens": prompt_tokens, "completion_tokens": completion_tokens,
+                      "total_tokens": prompt_tokens + completion_tokens},
+        })
+
+    client = OpenAI(api_key="test", base_url="https://fake.groq/openai/v1",
+                    http_client=httpx.Client(transport=httpx.MockTransport(handler)))
+    return client, calls
+
+
+def _fake_nli(contra_by_sample):
+    """P(contradiction) looked up by sample text; records the pairs it was given."""
+    seen = []
+
+    def nli(pairs):
+        seen.extend(pairs)
+        return [contra_by_sample[s] for _, s in pairs]
+
+    return nli, seen
+
+
+@pytest.fixture
+def sc_factory():
+    def make(samples, contra, **kw):
+        client, calls = _fake_sync_groq(samples)
+        nli, seen = _fake_nli(contra)
+        s = SelfCheckGPTScorer(client=client, nli=nli, price_in_per_mtok=kw.pop("pin", 1.0),
+                               price_out_per_mtok=kw.pop("pout", 2.0), **kw)
+        return s, calls, seen
+    return make
+
+
+class TestSelfCheckGPTScorer:
+    def test_satisfies_scorer_protocol(self, sc_factory):
+        s, _, _ = sc_factory(["a"], {"a": 0.0})
+        assert isinstance(s, Scorer)
+        assert s.name == "selfcheckgpt-nli"
+
+    def test_score_is_one_minus_mean_contradiction(self, sc_factory):
+        s, calls, seen = sc_factory(["a", "b", "c"], {"a": 0.0, "b": 0.3, "c": 0.9}, n_samples=3)
+        s.set_question("Can contributions be deducted?")
+        r = s.score(_claim(), DOCS)
+        assert r.score == pytest.approx(1 - (0.0 + 0.3 + 0.9) / 3)
+        assert calls["n"] == 3
+        assert r.deterministic is False
+        # official pair order: (sentence, sample)
+        assert seen[0] == (_claim().claim_text, "a")
+
+    def test_samples_shared_within_response(self, sc_factory):
+        s, calls, _ = sc_factory(["a"], {"a": 0.1}, n_samples=3)
+        s.set_question("q?")
+        r1 = s.score(_claim(), DOCS)
+        r2 = s.score(_claim(), DOCS)            # second claim of the same response
+        assert calls["n"] == 3                  # sampled once
+        assert r1.cost_usd == pytest.approx((900 * 1 + 150 * 2) / 1e6)
+        assert r2.cost_usd == 0.0
+        assert s.total_usage == {"prompt_tokens": 900, "completion_tokens": 150, "calls": 3}
+
+    def test_reset_samples_resamples(self, sc_factory):
+        s, calls, _ = sc_factory(["a"], {"a": 0.1}, n_samples=2)
+        s.set_question("q?")
+        s.score(_claim(), DOCS)
+        s.reset_samples()
+        s.score(_claim(), DOCS)
+        assert calls["n"] == 4
+
+    def test_new_question_resamples(self, sc_factory):
+        s, calls, _ = sc_factory(["a"], {"a": 0.1}, n_samples=2)
+        s.set_question("q1?"); s.score(_claim(), DOCS)
+        s.set_question("q2?"); s.score(_claim(), DOCS)
+        assert calls["n"] == 4
+
+    def test_request_uses_ragtruth_prompt_and_settings(self, sc_factory):
+        s, calls, _ = sc_factory(["a"], {"a": 0.0}, n_samples=1)
+        s.set_question("Can contributions be deducted?")
+        s.score(_claim(), DOCS)
+        body = calls["bodies"][0]
+        assert body["temperature"] == 1.0
+        assert body["model"] == s.model
+        assert body["reasoning_effort"] == "low"
+        prompt = body["messages"][0]["content"]
+        assert prompt.startswith("Briefly answer the following question:\nCan contributions be deducted?\n")
+        assert "following one passages:\npassage 1:You cannot deduct" in prompt
+        assert prompt.endswith('"Unable to answer based on given passages."\noutput:')
+
+    def test_empty_samples_dropped_and_counted(self, sc_factory):
+        s, _, seen = sc_factory(["", "a"], {"a": 0.4}, n_samples=2)
+        s.set_question("q?")
+        r = s.score(_claim(), DOCS)
+        assert s.n_empty_samples == 1
+        assert r.score == pytest.approx(0.6)
+        assert len(seen) == 1
+
+    def test_all_samples_empty_scores_zero(self, sc_factory):
+        s, _, _ = sc_factory([""], {}, n_samples=2)
+        s.set_question("q?")
+        assert s.score(_claim(), DOCS).score == 0.0
+        assert s.n_empty_samples == 2
+
+    def test_alignment_none_skips_llm(self, sc_factory):
+        s, calls, _ = sc_factory(["a"], {"a": 0.0})
+        r = s.score(_claim("none"), DOCS)
+        assert r.score == 0.0 and r.cost_usd == 0.0 and calls["n"] == 0
+
+    def test_question_fallback_counted(self, sc_factory):
+        s, _, _ = sc_factory(["a"], {"a": 0.0}, n_samples=1)
+        s.score(_claim(), DOCS)
+        assert s.n_fallback_question == 1
+
+    def test_missing_api_key_raises(self, monkeypatch):
+        monkeypatch.delenv("GROQ_API_KEY", raising=False)
+        with pytest.raises(RuntimeError, match="GROQ_API_KEY"):
+            SelfCheckGPTScorer(nli=lambda p: [], price_in_per_mtok=0, price_out_per_mtok=0)
