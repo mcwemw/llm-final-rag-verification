@@ -3,6 +3,9 @@
 # ...except reproducibility tools and block implementations (deliverables).
 !tools/*.py
 !blocks/*.py
+# Secrets (API keys such as GROQ_API_KEY) — never commit
+.env
+.env.*
 # Python bytecode caches (regenerated on every run)
 __pycache__/
 *.pyc
