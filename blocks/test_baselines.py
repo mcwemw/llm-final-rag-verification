@@ -158,14 +158,35 @@ class TestRagasScorer:
         r = s.score(_claim(), DOCS)
         # 2 calls x (100 in, 20 out) -> 200*1 + 40*2 = 280 / 1e6
         assert r.cost_usd == pytest.approx(280 / 1e6)
-        assert s.total_usage == {"prompt_tokens": 200, "completion_tokens": 40, "calls": 2}
+        assert {k: s.total_usage[k] for k in ("prompt_tokens", "completion_tokens", "calls")} == \
+            {"prompt_tokens": 200, "completion_tokens": 40, "calls": 2}
 
-    def test_sends_temperature_zero_and_model(self, ragas_factory):
+    def test_sends_temperature_zero_top_p_one_and_model(self, ragas_factory):
         s, calls = ragas_factory([1])
         s.score(_claim(), DOCS)
-        body = calls["bodies"][0]
-        assert body["temperature"] == 0.0
-        assert body["model"] == s.model
+        for body in calls["bodies"]:
+            assert body["temperature"] == 0.0
+            assert body["top_p"] == 1.0
+            assert body["model"] == s.model
+
+    def test_status(self, ragas_factory):
+        s, _ = ragas_factory([1])
+        s.score(_claim(), DOCS)
+        assert s.last_status == "ok"
+        s.score(_claim("none"), DOCS)
+        assert s.last_status == "skipped_no_source"
+
+    def test_per_claim_usage_resets(self, ragas_factory):
+        s, _ = ragas_factory([1])
+        s.score(_claim(), DOCS)
+        s.score(_claim(), DOCS)
+        assert s.last_usage["calls"] == 2 and s.total_usage["calls"] == 4
+
+    def test_config_records_provider_and_prompt_version(self, ragas_factory):
+        s, _ = ragas_factory([1])
+        c = s.config
+        assert c["provider"] == "groq" and c["top_p"] == 1.0 and c["cache"] is None
+        assert c["prompt_version"].startswith("ragas==")
 
     def test_question_fallback_counted(self, ragas_factory):
         s, _ = ragas_factory([1])
@@ -270,7 +291,8 @@ class TestSelfCheckGPTScorer:
         assert calls["n"] == 3                  # sampled once
         assert r1.cost_usd == pytest.approx((900 * 1 + 150 * 2) / 1e6)
         assert r2.cost_usd == 0.0
-        assert s.total_usage == {"prompt_tokens": 900, "completion_tokens": 150, "calls": 3}
+        assert {k: s.total_usage[k] for k in ("prompt_tokens", "completion_tokens", "calls")} == \
+            {"prompt_tokens": 900, "completion_tokens": 150, "calls": 3}
 
     def test_reset_samples_resamples(self, sc_factory):
         s, calls, _ = sc_factory(["a"], {"a": 0.1}, n_samples=2)
@@ -294,6 +316,7 @@ class TestSelfCheckGPTScorer:
         assert body["temperature"] == 1.0
         assert body["model"] == s.model
         assert body["reasoning_effort"] == "low"
+        assert body["top_p"] == 1.0
         prompt = body["messages"][0]["content"]
         assert prompt.startswith("Briefly answer the following question:\nCan contributions be deducted?\n")
         assert "following one passages:\npassage 1:You cannot deduct" in prompt
@@ -327,3 +350,68 @@ class TestSelfCheckGPTScorer:
         monkeypatch.delenv("GROQ_API_KEY", raising=False)
         with pytest.raises(RuntimeError, match="GROQ_API_KEY"):
             SelfCheckGPTScorer(nli=lambda p: [], price_in_per_mtok=0, price_out_per_mtok=0)
+
+
+# ── provider selection / accounting helpers ───────────────────────────────────
+
+from blocks import baselines as _b  # noqa: E402
+
+
+class TestProviders:
+    def test_fireworks_defaults(self, monkeypatch):
+        monkeypatch.setenv("FIREWORKS_API_KEY", "fw_test")
+        s = SelfCheckGPTScorer(provider="fireworks", nli=lambda p: [], price_in_per_mtok=0,
+                               price_out_per_mtok=0)
+        assert s.base_url == "https://api.fireworks.ai/inference/v1"
+        assert s.model == "accounts/fireworks/models/glm-5p3-flash"
+        assert s.config["provider"] == "fireworks"
+
+    def test_fireworks_missing_key_names_the_right_env(self, monkeypatch):
+        monkeypatch.delenv("FIREWORKS_API_KEY", raising=False)
+        with pytest.raises(RuntimeError, match="FIREWORKS_API_KEY"):
+            RagasScorer(provider="fireworks", price_in_per_mtok=0, price_out_per_mtok=0)
+
+    def test_unknown_provider(self):
+        with pytest.raises(ValueError):
+            RagasScorer(provider="nope", price_in_per_mtok=0, price_out_per_mtok=0)
+
+    def test_retries_counted_from_http_requests(self):
+        u = _b._Usage()
+        u.add("http_requests", 3)
+        u.add("calls", 1)
+        assert u.last_retries == 2
+
+    def test_retry_hook_counts_real_http_requests(self, monkeypatch):
+        """A 429 then 200: the client retries once; our httpx hook sees 2 requests for 1 call."""
+        monkeypatch.setenv("GROQ_API_KEY", "test")
+        n = {"i": 0}
+
+        def handler(request):
+            n["i"] += 1
+            if n["i"] == 1:
+                return httpx.Response(429, headers={"retry-after": "0"}, json={"error": {"message": "rl"}})
+            return httpx.Response(200, json={
+                "id": "x", "object": "chat.completion", "created": 0, "model": "m",
+                "choices": [{"index": 0, "finish_reason": "stop",
+                             "message": {"role": "assistant", "content": "sample"}}],
+                "usage": {"prompt_tokens": 1, "completion_tokens": 1, "total_tokens": 2}})
+
+        class PatchedClient(httpx.Client):  # subclass: openai checks isinstance(http_client, httpx.Client)
+            def __init__(self, *a, **kw):
+                kw["transport"] = httpx.MockTransport(handler)
+                super().__init__(*a, **kw)
+
+        monkeypatch.setattr(httpx, "Client", PatchedClient)
+        s = SelfCheckGPTScorer(n_samples=1, nli=lambda p: [0.0] * len(p),
+                               price_in_per_mtok=0, price_out_per_mtok=0)
+        s.set_question("q?")
+        s.score(_claim(), DOCS)
+        assert s.last_usage["calls"] == 1 and s.last_usage["http_requests"] == 2
+        assert s.last_retries == 1
+
+    def test_selfcheck_nli_accounting_separate(self, sc_factory):
+        s, _, _ = sc_factory(["a", "b"], {"a": 0.0, "b": 0.0}, n_samples=2)
+        s.set_question("q?")
+        s.score(_claim(), DOCS)
+        assert s.last_nli["pairs"] == 2 and s.total_nli["pairs"] == 2
+        assert s.last_status == "ok"
