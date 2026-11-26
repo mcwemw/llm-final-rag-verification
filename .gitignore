@@ -3,10 +3,6 @@
 # ...except reproducibility tools and block implementations (deliverables).
 !tools/*.py
 !blocks/*.py
-!rag_base/*.py
-# course materials (no license -> never redistributed) and generated outputs
-rag_base/course/
-rag_base/out/
 faithfulness-gate/
 research-connection.md
 STATUS.md
@@ -22,3 +18,8 @@ calibration*/
 *.blg
 *.log
 *.bbl
+# rag_base (course Program 1/2 port): track our .py; course materials (no license, never
+# redistributed) and generated outputs (contain corpus text) stay out
+!rag_base/*.py
+rag_base/course/
+rag_base/out/
