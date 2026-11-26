@@ -3,6 +3,10 @@
 # ...except reproducibility tools and block implementations (deliverables).
 !tools/*.py
 !blocks/*.py
+!rag_base/*.py
+# course materials (no license -> never redistributed) and generated outputs
+rag_base/course/
+rag_base/out/
 faithfulness-gate/
 research-connection.md
 STATUS.md
