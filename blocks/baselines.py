@@ -143,7 +143,8 @@ class RagasScorer:
     Measurement settings (keep fixed across the study):
       * NO response cache — a cache would replay identical answers and fake Det-var = 0.
       * temperature 0.0 (most favourable to RAGAS; variance at T=0 is a conservative finding),
-        top_p 1.0, both sent explicitly.
+        top_p 1.0, both sent explicitly. max_tokens 4096: ragas' default 1024 truncated
+        GLM-5.3-Flash (a reasoning model) on 2/45 pilot claims (IncompleteOutputException).
       * context = the cited span (same input as the other Block 5 scorers); "all_docs"
         joins every cited_doc instead.
       * provider = groq | fireworks (same gpt-oss-20b weights); recorded in `config`.
@@ -164,6 +165,7 @@ class RagasScorer:
         temperature: float | None = 0.0,
         top_p: float | None = 1.0,
         seed: int | None = None,
+        max_tokens: int | None = 4096,
         price_in_per_mtok: float | None = None,
         price_out_per_mtok: float | None = None,
         context: str = "cited_span",
@@ -181,6 +183,7 @@ class RagasScorer:
         self.temperature = temperature
         self.top_p = top_p
         self.seed = seed
+        self.max_tokens = max_tokens
         self.price_in = price_in_per_mtok
         self.price_out = price_out_per_mtok
         self.context = context
@@ -218,6 +221,8 @@ class RagasScorer:
                 kwargs["top_p"] = top_p
             if seed is not None:
                 kwargs["seed"] = seed
+            if max_tokens is not None:  # ragas default 1024 truncates reasoning models (pilot 2026-11-27)
+                kwargs["max_tokens"] = max_tokens
             llm = llm_factory(self.model, provider="openai", client=client, **kwargs)  # no cache
         self._metric = Faithfulness(llm=llm)
 
@@ -259,7 +264,7 @@ class RagasScorer:
         """Settings to log next to results for reproducibility."""
         return {"method": self.name, "provider": self.provider, "base_url": self.base_url,
                 "model": self.model, "temperature": self.temperature, "top_p": self.top_p,
-                "seed": self.seed, "context": self.context, "cache": None,
+                "seed": self.seed, "max_tokens": self.max_tokens, "context": self.context, "cache": None,
                 "prompt_version": f"ragas=={self.ragas_version} Faithfulness (collections)",
                 "price_in_per_mtok": self.price_in, "price_out_per_mtok": self.price_out}
 

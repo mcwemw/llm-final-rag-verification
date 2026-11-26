@@ -168,6 +168,7 @@ class TestRagasScorer:
             assert body["temperature"] == 0.0
             assert body["top_p"] == 1.0
             assert body["model"] == s.model
+            assert body.get("max_tokens", body.get("max_completion_tokens")) == 4096
 
     def test_status(self, ragas_factory):
         s, _ = ragas_factory([1])
