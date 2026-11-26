@@ -3,6 +3,13 @@
 # ...except reproducibility tools and block implementations (deliverables).
 !tools/*.py
 !blocks/*.py
+# ...and the benchmark harness + scorers (exp/, deliverable code).
+!exp/*.py
+!exp/scorers/*.py
+# ...but NEVER harness results / fetched RAGTruth data / caches.
+exp/results/
+exp/data/
+**/__pycache__/
 faithfulness-gate/
 research-connection.md
 STATUS.md
