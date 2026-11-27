@@ -43,11 +43,15 @@ class ScoreExportError(ValueError):
     """Raised when an export violates score-export-v1 (fail-loud)."""
 
 
-def load_export(path_or_obj) -> dict:
+def load_export(path_or_obj, expected_dataset_version: Optional[str] = None,
+                expected_dataset_sha: Optional[str] = None) -> dict:
     """Load + validate an export HEADER. Raises ScoreExportError on any
     missing/invalid required field. Returns the parsed object.
 
-    Accepts a path (str) or an already-parsed dict (for tests)."""
+    Accepts a path (str) or an already-parsed dict (for tests).
+    expected_dataset_version / expected_dataset_sha (optional): schema §3 rule 5 —
+    reject an export computed on a different data version (ported from the
+    release/harness loader so the canonical ingest keeps that guard)."""
     if isinstance(path_or_obj, dict):
         obj = path_or_obj
     else:
@@ -83,6 +87,15 @@ def load_export(path_or_obj) -> dict:
 
     if not isinstance(obj["scores"], list) or not obj["scores"]:
         raise ScoreExportError("scores[] must be a non-empty list")
+
+    if expected_dataset_version is not None and obj["dataset_version"] != expected_dataset_version:
+        raise ScoreExportError(
+            f"dataset_version mismatch: export={obj['dataset_version']!r} "
+            f"expected={expected_dataset_version!r}")
+    if expected_dataset_sha is not None and obj.get("dataset_sha") != expected_dataset_sha:
+        raise ScoreExportError(
+            f"dataset_sha mismatch: export={obj.get('dataset_sha')!r} "
+            f"expected={expected_dataset_sha!r}")
 
     return obj
 
