@@ -51,11 +51,20 @@ By default, Program 2 uses the course's prebuilt KB. Pass `--kb rag_base/out/kb/
 - Every bundle is checked before it is written: the JSON Schema plus the three invariants of spec 02 (doc_id exists, span in range, `text[span] == citation.text`).
 
 ## Verified (2026-11-27, RTX 4070)
-- Program 1 rebuilds a `documents.json` **identical** to the course's prebuilt KB.
-- Retrieval hit@3 is **15/16** on the course question set, for both the prebuilt and the rebuilt KB. The miss is q01, where the expected doc_001 is not in the top 3. The 3 "should refuse" questions are excluded.
+- **Recorded live demo:** see [LIVE_DEMO_2026-11-27.md](LIVE_DEMO_2026-11-27.md). It ran from a fresh worktree and a fresh download, with every step exit=0:
+  - the 4 course files match the pinned sha256;
+  - Program 1 rebuilds a `documents.json` **identical** to the course's prebuilt KB;
+  - retrieval hit@3 is 15/16 on both the prebuilt and the rebuilt KB;
+  - Program 2 answered **19/19** questions with the rebuilt KB, and all bundles pass the schema and the spec-02 invariants.
+- The record has the environment (Python / torch / transformers / GPU), the sha256 of every input and output, and the run log location.
+- The miss in hit@3 is q01: the expected doc_001 is not in the top 3. The 3 "should refuse" questions are excluded.
 - The functions loaded from the notebooks give output identical to the earlier copied port. This was checked on all 16 documents and on 14 real Program 2 answers.
+- **Groq free tier:** Program 2 retries rate limits (429) up to 6 times with backoff. It exits non-zero and lists the failed questions if any question gets no answer. Before this fix, a run lost 4/19 questions and still exited 0.
 
 ## Findings for the report
-- **The course's own presence-only check misses citations.** `citation_note()` only matches half-width `[doc_xxx]`, but `gpt-oss-120b` mostly writes full-width or other brackets (`【doc_xxx】`, `〔doc_xxx〕`, `（doc_xxx）`). All **19** answers to the course question set cite documents, yet `citation_note()` reports "回答未附文件編號" (no citation attached) for **17 of 19**. Measured 2026-11-27.
+- **The course's own presence-only check misses citations.** `citation_note()` only matches half-width `[doc_xxx]`, but `gpt-oss-120b` mostly writes full-width or other brackets (`【doc_xxx】`, `〔doc_xxx〕`, `（doc_xxx）`).
+  - Recorded run (2026-11-27): 18/19 answers cite documents, and `citation_note()` reports "回答未附文件編號" (no citation attached) for **14 of the 18**. The 4 it recognises use half-width brackets.
+  - An earlier run the same day: **17 of 19**.
+  - Answers are sampled at T=0.2, so the count varies per run. The cause does not.
 - Refusals can also mention doc ids. For example, q17 ("這家店的店長叫什麼名字？") is correctly refused, but it names `(doc_004)` and others as the documents that do *not* contain the answer. The bundle export treats any mention as a citation.
 - The English Block 3/4 rules cannot segment or align these Chinese answers. See the `--lang zh` proposal in PR #4.
