@@ -164,10 +164,15 @@ def coverage(prob_rows: list[dict]) -> float:
 
 
 def determinism_trusted(export: dict) -> bool:
-    """A rerun's determinism number is trustworthy only if sampling was reset.
-    selfcheck with rerun=true & samples_reset=false fakes Det-var=0."""
+    """Schema section 3 rule 4 (release semantics, decided 2026-11-27):
+    - rerun=false: determinism was not measured by this export -> False
+      (never carry over an earlier or cached determinism result);
+    - selfcheck with rerun=true & samples_reset=false fakes Det-var=0 -> False;
+    - otherwise True."""
     obj = load_export(export)
-    if obj.get("rerun") and obj["technique"] == "selfcheck":
+    if not obj.get("rerun"):
+        return False
+    if obj["technique"] == "selfcheck":
         return bool(obj.get("samples_reset", False))
     return True
 
