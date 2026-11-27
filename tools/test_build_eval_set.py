@@ -1,6 +1,7 @@
 """Checks on the committed eval_40pos_v1 files (no RAGTruth download needed)."""
 import hashlib
 import json
+import subprocess
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -18,6 +19,11 @@ def test_manifest_hashes_match_files():
     assert set(m["outputs"]) == on_disk
     for rel, digest in m["outputs"].items():
         assert hashlib.sha256((EVAL / rel).read_bytes()).hexdigest() == digest, rel
+    # every file in the manifest must be committed (".gitignore: *.jsonl" once dropped claims.jsonl)
+    tracked = subprocess.run(["git", "ls-files", str(EVAL)], cwd=ROOT, capture_output=True, text=True).stdout.split()
+    if tracked:
+        rel_tracked = {str(Path(x).relative_to(EVAL.relative_to(ROOT))) for x in tracked}
+        assert set(m["outputs"]) | {"manifest.json"} <= rel_tracked, set(m["outputs"]) - rel_tracked
 
 
 def test_at_least_40_valid_positives_and_counts_agree():
