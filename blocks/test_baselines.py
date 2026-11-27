@@ -416,3 +416,10 @@ class TestProviders:
         s.score(_claim(), DOCS)
         assert s.last_nli["pairs"] == 2 and s.total_nli["pairs"] == 2
         assert s.last_status == "ok"
+
+
+def test_export_bundle_id_is_bare_response_id():
+    # harness joins score-export bundle_id on str(row["id"]) (e.g. "12003"), not the bundle file name
+    from tools.export_scores import response_id
+    assert response_id("ragtruth-12003") == "12003"
+    assert response_id("12003") == "12003"

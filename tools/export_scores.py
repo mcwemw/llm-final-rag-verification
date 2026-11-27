@@ -20,6 +20,16 @@ TECHNIQUE = {"presence-only": "presence", "ragas-llm-judge": "ragas", "selfcheck
 REQUIRED = ["schema_version", "run_id", "technique", "model", "scorer_version", "dataset_version",
             "score_direction", "score_range", "rerun", "created_at", "scores"]
 REQUIRED_SELFCHECK = ["n_samples", "generator_model", "samples_reset"]
+BUNDLE_PREFIX = "ragtruth-"
+
+
+def response_id(bundle: str) -> str:
+    """score-export-v1 bundle_id = bare RAGTruth response id ("ragtruth-12003" -> "12003").
+
+    The harness joins on str(row["id"]); dataset identity is carried by dataset_version and
+    dataset_sha, so the prefix adds nothing. Agreed with the harness owner 2026-11-27.
+    """
+    return bundle[len(BUNDLE_PREFIX):] if bundle.startswith(BUNDLE_PREFIX) else bundle
 
 
 def validate(doc: dict) -> None:
@@ -100,7 +110,7 @@ def main() -> None:
                 "llm_usage": llm if tech != "presence" else None,
                 "cost_usd_actual": sum(r["cost_usd"] for r in rs),
                 "cost_usd_estimate_all_runs": s_sum.get("cost_usd_estimate"),
-                "scores": [{"bundle_id": r["bundle"], "claim_id": r["claim_id"], "score": r["score"],
+                "scores": [{"bundle_id": response_id(r["bundle"]), "bundle": r["bundle"], "claim_id": r["claim_id"], "score": r["score"],
                             "error": r["error"], "status": r["status"], "char_start": r["char_start"],
                             "char_end": r["char_end"], "cost_usd": r["cost_usd"],
                             "retries": r.get("retries", 0)} for r in rs],
