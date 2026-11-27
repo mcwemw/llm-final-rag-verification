@@ -13,6 +13,7 @@ from __future__ import annotations
 
 import re
 import time
+import zlib
 from dataclasses import dataclass
 from typing import Protocol, runtime_checkable
 
@@ -135,7 +136,8 @@ class SelfAttentionScorer:
 
     Implements the same character n-gram → self-attention pooling pipeline
     as HW1 P2.  No external ML framework required; numpy only.
-    Fixed random seed → fully deterministic.
+    Fixed random seed + process-independent n-gram hashing (zlib.crc32) → fully deterministic,
+    also across processes.
     """
 
     name = "hw1-selfattn"
@@ -162,7 +164,9 @@ class SelfAttentionScorer:
             v = np.zeros(self._DIM, dtype=np.float32)
             for n in self._NGRAMS:
                 for i in range(len(w) - n + 1):
-                    h = hash(w[i:i+n]) % self._DIM
+                    # zlib.crc32, not hash(): str hashes are salted per process
+                    # (PYTHONHASHSEED), which made this "deterministic" scorer vary run to run.
+                    h = zlib.crc32(w[i:i+n].encode("utf-8")) % self._DIM
                     v[h] += 1.0
             norm = np.linalg.norm(v)
             vecs.append(v / norm if norm > 0 else v)
