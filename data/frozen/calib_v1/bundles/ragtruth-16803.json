@@ -1,0 +1,39 @@
+{
+  "schema_version": "1.1",
+  "question": "weather in mallorca",
+  "answer": "Based on the provided passages, here is the answer to your question:\n\nThe weather in Mallorca is generally pleasant throughout the year, with warm summers and mild winters. According to passage 1, the temperature in Spring (March to May) ranges between 18-20°C (64-68°F), although nights can still be cool. However, this time of year is not suitable for swimming in the ocean as it is still too cold. Passage 2 mentions that summer in Mallorca is hot and dry, while winters are pleasant and mild. Passage 3 provides a 10-day forecast for Palma de Mallorca, which indicates that the current temperature is around 17°C (63°F) and there is a low chance of precipitation. Therefore, the best time to visit Mallorca for good weather is likely during the spring or summer months.",
+  "citations": [
+    {
+      "doc_id": "ragtruth-12292-p1",
+      "span_start": 10,
+      "span_end": 418,
+      "text": "Spring in Mallorca (Majorca) Between March and May the temperature gets back to 18 to 20 degrees. Nights may still get cold during spring in Mallorca and spring season is generally too cold for swimming in the ocean. Mallorca is a year-round great holiday destination with great weather. The surround ocean deters extreme weather. Majorca's high tourist season begins in April and ends around late September."
+    },
+    {
+      "doc_id": "ragtruth-12292-p2",
+      "span_start": 430,
+      "span_end": 746,
+      "text": "Mallorca experiences great Mediterranean weather with temperatures much more pleasant that that of continental Europe. The Mallorca travel guide explains that summers in Majorca (Mallorca) are normally hot and dry while winters tend to be pleasant and mild. The Island of Majorca is large and covered with mountains."
+    },
+    {
+      "doc_id": "ragtruth-12292-p3",
+      "span_start": 758,
+      "span_end": 1130,
+      "text": "Be prepared with the most accurate 10-day forecast for Palma de Mallorca, Spain with highs, lows, chance of precipitation from The Weather Channel and Weather.com Be prepared with the most accurate 10-day forecast for Palma de Mallorca, Spain with highs, lows, chance of precipitation from The Weather Channel and Weather.com Scan for updated forecast Connection restored!"
+    }
+  ],
+  "retrieved": [
+    {
+      "doc_id": "ragtruth-12292-p1",
+      "text": "Spring in Mallorca (Majorca) Between March and May the temperature gets back to 18 to 20 degrees. Nights may still get cold during spring in Mallorca and spring season is generally too cold for swimming in the ocean. Mallorca is a year-round great holiday destination with great weather. The surround ocean deters extreme weather. Majorca's high tourist season begins in April and ends around late September."
+    },
+    {
+      "doc_id": "ragtruth-12292-p2",
+      "text": "Mallorca experiences great Mediterranean weather with temperatures much more pleasant that that of continental Europe. The Mallorca travel guide explains that summers in Majorca (Mallorca) are normally hot and dry while winters tend to be pleasant and mild. The Island of Majorca is large and covered with mountains."
+    },
+    {
+      "doc_id": "ragtruth-12292-p3",
+      "text": "Be prepared with the most accurate 10-day forecast for Palma de Mallorca, Spain with highs, lows, chance of precipitation from The Weather Channel and Weather.com Be prepared with the most accurate 10-day forecast for Palma de Mallorca, Spain with highs, lows, chance of precipitation from The Weather Channel and Weather.com Scan for updated forecast Connection restored!"
+    }
+  ]
+}
