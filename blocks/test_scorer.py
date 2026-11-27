@@ -39,6 +39,34 @@ def test_scorer_result_score_bounds():
         assert 0.0 <= r.score <= 1.0
 
 
+# ── NLIScorer label mapping ───────────────────────────────────────────────────
+
+def test_nli_label_index_by_name():
+    # cross-encoder/nli-deberta-v3-small: {0: contradiction, 1: entailment, 2: neutral};
+    # the old code read index 2 (= neutral) as entailment.
+    import pytest
+    from blocks.scorer import _label_index
+    assert _label_index({0: "contradiction", 1: "entailment", 2: "neutral"}, "entailment") == 1
+    assert _label_index({"0": "CONTRADICTION", "1": "NEUTRAL", "2": "ENTAILMENT"}, "entailment") == 2
+    with pytest.raises(ValueError):
+        _label_index({0: "LABEL_0", 1: "LABEL_1", 2: "LABEL_2"}, "entailment")
+
+
+def test_nli_scorer_entailment_is_high_for_entailed_claim():
+    import pytest
+    pytest.importorskip("sentence_transformers")
+    from blocks.aligner import AlignedClaim
+    from blocks.scorer import NLIScorer
+    s = NLIScorer()
+    def claim(text):
+        return AlignedClaim(claim_text=text, char_start=0, char_end=len(text), cited_doc_id="d1",
+                            cited_span_text="The cat sat on the mat.", alignment="explicit")
+    docs = [{"doc_id": "d1", "text": "The cat sat on the mat."}]
+    entailed = s.score(claim("A cat is on the mat."), docs).score
+    unrelated = s.score(claim("The cat is black."), docs).score   # neutral, not entailed
+    assert entailed > 0.9 and unrelated < 0.1
+
+
 # ── SelfAttentionScorer — full tests (no external deps) ───────────────────────
 
 class TestSelfAttentionScorer:
@@ -168,3 +196,31 @@ class TestEmbeddingScorer:
                        "Roth IRA allows tax-free withdrawals")
         result = scorer.score(claim, _docs("Roth IRA allows tax-free withdrawals"))
         assert result.deterministic is True
+
+
+def test_selfattn_deterministic_across_processes():
+    """HW1 scorer must give identical scores in separate processes with different
+    PYTHONHASHSEED values (regression: it used the salted built-in hash())."""
+    import os
+    import subprocess
+    import sys
+    from pathlib import Path
+
+    code = (
+        "from blocks.aligner import AlignedClaim\n"
+        "from blocks.scorer import SelfAttentionScorer\n"
+        "s = SelfAttentionScorer()\n"
+        "pairs = [('Roth IRA contributions are not tax-deductible', 'You cannot deduct contributions to a Roth IRA.'),\n"
+        "         ('quantum computing uses qubit superposition states', 'pine nuts harvested from BC forests')]\n"
+        "for c, d in pairs:\n"
+        "    a = AlignedClaim(c, 0, len(c), 'p1', d, 'nearest')\n"
+        "    print(repr(s.score(a, [{'doc_id': 'p1', 'text': d}]).score))\n"
+    )
+    repo = str(Path(__file__).resolve().parent.parent)
+    outs = set()
+    for seed in ("0", "1", "12345"):
+        env = {**os.environ, "PYTHONHASHSEED": seed}
+        r = subprocess.run([sys.executable, "-c", code], cwd=repo, env=env,
+                           capture_output=True, text=True, check=True)
+        outs.add(r.stdout)
+    assert len(outs) == 1, f"scores differ across processes: {outs}"
