@@ -149,7 +149,7 @@ def make_scorer(name: str, args, price_in, price_out):
     common = dict(provider=args.provider, model=args.model, seed=args.seed,
                   price_in_per_mtok=price_in, price_out_per_mtok=price_out)
     if name == "ragas":
-        return b.RagasScorer(temperature=args.ragas_temperature, **common)
+        return b.RagasScorer(temperature=args.ragas_temperature, context=args.ragas_context, **common)
     if name == "selfcheck":
         return b.SelfCheckGPTScorer(n_samples=args.sc_samples, **common)
     raise ValueError(name)
@@ -180,6 +180,7 @@ def scorer_stub_config(name: str, args) -> dict:
     return {"scorer": name, "provider": args.provider if name != "presence" else None,
             "model": args.model if name != "presence" else None, "seed": args.seed,
             "ragas_temperature": args.ragas_temperature if name == "ragas" else None,
+            "ragas_context": args.ragas_context if name == "ragas" else None,
             "sc_samples": args.sc_samples if name == "selfcheck" else None,
             "threshold": args.threshold}
 
@@ -203,6 +204,9 @@ def main() -> None:
                     help="off by default: a fixed sampling seed would suppress the run-to-run "
                          "variance that Det-var is meant to measure")
     ap.add_argument("--ragas-temperature", type=float, default=0.0)
+    ap.add_argument("--ragas-context", default="cited_span", choices=["cited_span", "all_docs"],
+                    help="judge context: the aligned passage only, or every cited passage "
+                         "(RAGTruth annotators judged against all passages)")
     ap.add_argument("--sc-samples", type=int, default=3)
     ap.add_argument("--price-in", type=float, default=None, help="USD per 1M input tokens")
     ap.add_argument("--price-out", type=float, default=None, help="USD per 1M output tokens")
