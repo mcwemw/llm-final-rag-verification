@@ -1,0 +1,39 @@
+{
+  "schema_version": "1.1",
+  "question": "how to make breaded fish in an air fryer",
+  "answer": "Based on the given passages, here's a brief answer to the question \"How to make breaded fish in an air fryer\":\n\nPreheat the air fryer to 200°C for 5 minutes. Mix breadcrumbs, salt, pepper, parsley, and olive oil in a bowl. Cut the fish into 8 long pieces and dip each piece in flour, shaking off any excess. Dip the fish in the breadcrumb mixture and place it in the air fryer. Cook for about 15 minutes or until golden.\n\nNote: The instructions are based on the third passage provided.",
+  "citations": [
+    {
+      "doc_id": "ragtruth-14466-p1",
+      "span_start": 10,
+      "span_end": 338,
+      "text": "Yes, really. This rice cooker-sized appliance fries and roasts using hot air (from 80 to 200 deg C), which circulates around the food. No oil is needed for most foods, such as chicken wings and frozen French fries, while less oily ingredients like fish fillets or home-made fries need just a brush of oil. The Philips Air Fryer."
+    },
+    {
+      "doc_id": "ragtruth-14466-p2",
+      "span_start": 350,
+      "span_end": 637,
+      "text": "French fries being a staple in the American diet, the air fryer does a wonderful job frying French fries. A single layer of Frozen fries take about 12 minutes only to get that crispy outside and moist inside texture. Get ready for dinner with air fried fish and chips in just 15 minutes."
+    },
+    {
+      "doc_id": "ragtruth-14466-p3",
+      "span_start": 649,
+      "span_end": 1218,
+      "text": "Directions. 1  For fish, preheat the Airfryer at 200 degree C for 5 minutes. Meanwhile, mix bread crumbs, salt, pepper, parsley and olive oil in a bowl. 2  Cut the fish into 8 long pieces. Crack the egg in a shallow bowl and use a fork to lightly whisk. 3  Dip 1 piece of fish in the flour. Shake off any excess.  Place the fish in air fryer. Repeat with all the remaining fish pieces and put in air fryer and cook for about 15 minutes or until golden. For chips, cut the potatoes in wedges shape with skin on. Soak them in a bowl with mild salted water for 20 minutes."
+    }
+  ],
+  "retrieved": [
+    {
+      "doc_id": "ragtruth-14466-p1",
+      "text": "Yes, really. This rice cooker-sized appliance fries and roasts using hot air (from 80 to 200 deg C), which circulates around the food. No oil is needed for most foods, such as chicken wings and frozen French fries, while less oily ingredients like fish fillets or home-made fries need just a brush of oil. The Philips Air Fryer."
+    },
+    {
+      "doc_id": "ragtruth-14466-p2",
+      "text": "French fries being a staple in the American diet, the air fryer does a wonderful job frying French fries. A single layer of Frozen fries take about 12 minutes only to get that crispy outside and moist inside texture. Get ready for dinner with air fried fish and chips in just 15 minutes."
+    },
+    {
+      "doc_id": "ragtruth-14466-p3",
+      "text": "Directions. 1  For fish, preheat the Airfryer at 200 degree C for 5 minutes. Meanwhile, mix bread crumbs, salt, pepper, parsley and olive oil in a bowl. 2  Cut the fish into 8 long pieces. Crack the egg in a shallow bowl and use a fork to lightly whisk. 3  Dip 1 piece of fish in the flour. Shake off any excess.  Place the fish in air fryer. Repeat with all the remaining fish pieces and put in air fryer and cook for about 15 minutes or until golden. For chips, cut the potatoes in wedges shape with skin on. Soak them in a bowl with mild salted water for 20 minutes."
+    }
+  ]
+}

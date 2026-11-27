@@ -1,0 +1,39 @@
+{
+  "schema_version": "1.1",
+  "question": "what does clutch mean in golf",
+  "answer": "Based on the provided passages, \"clutch\" in golf refers to a putt that a player must make, often under high pressure, such as a short par putt for an average golfer or a longer putt to win a tournament or get into a playoff for a professional. The term \"clutch\" is used to describe this type of putt because it is critical to the outcome of the game, and the player's performance in these situations can be influenced by their beliefs and confidence levels.",
+  "citations": [
+    {
+      "doc_id": "ragtruth-12164-p1",
+      "span_start": 10,
+      "span_end": 297,
+      "text": "Clutch putt is simply a term that is frequently used for a putt which a player must make, especially where there is a lot of pressure on them, for an average golfer it may simply be a 6 foot par putt, for a professional it could be a 10 footer to win a tournament or get into a play off."
+    },
+    {
+      "doc_id": "ragtruth-12164-p2",
+      "span_start": 309,
+      "span_end": 619,
+      "text": "This leads to the biggest problem with the idea of clutch, that it is a self-fulfilling prophecy to athletes. This is when something only happens because you believe it will. If an athlete hears enough times that he will fail when the game is on the line, he will start believing it himself and will soon fail."
+    },
+    {
+      "doc_id": "ragtruth-12164-p3",
+      "span_start": 631,
+      "span_end": 942,
+      "text": "Confidence votes 25.0K. Clutch putt is simply a term that is frequently used for a putt which a player must make, especially where there is a lot of pressure on them, for an average golfer it may simply be a 6 foot par putt, for a professional it could be a 10 footer to win a tournament or get into a play off."
+    }
+  ],
+  "retrieved": [
+    {
+      "doc_id": "ragtruth-12164-p1",
+      "text": "Clutch putt is simply a term that is frequently used for a putt which a player must make, especially where there is a lot of pressure on them, for an average golfer it may simply be a 6 foot par putt, for a professional it could be a 10 footer to win a tournament or get into a play off."
+    },
+    {
+      "doc_id": "ragtruth-12164-p2",
+      "text": "This leads to the biggest problem with the idea of clutch, that it is a self-fulfilling prophecy to athletes. This is when something only happens because you believe it will. If an athlete hears enough times that he will fail when the game is on the line, he will start believing it himself and will soon fail."
+    },
+    {
+      "doc_id": "ragtruth-12164-p3",
+      "text": "Confidence votes 25.0K. Clutch putt is simply a term that is frequently used for a putt which a player must make, especially where there is a lot of pressure on them, for an average golfer it may simply be a 6 foot par putt, for a professional it could be a 10 footer to win a tournament or get into a play off."
+    }
+  ]
+}
