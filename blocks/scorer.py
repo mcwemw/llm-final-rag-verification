@@ -95,6 +95,14 @@ def _softmax(x: "np.ndarray") -> "np.ndarray":
     return e / e.sum()
 
 
+def _label_index(id2label: dict, name: str) -> int:
+    """Index of `name` in a model's id2label (case-insensitive). Fail loud if it is absent."""
+    hits = [int(i) for i, lab in id2label.items() if str(lab).lower() == name]
+    if len(hits) != 1:
+        raise ValueError(f"NLI model has no unique {name!r} label: {id2label}")
+    return hits[0]
+
+
 class NLIScorer:
     """Cross-encoder NLI entailment probability. Local, deterministic."""
 
@@ -103,6 +111,9 @@ class NLIScorer:
     def __init__(self, model_name: str = "cross-encoder/nli-deberta-v3-small") -> None:
         from sentence_transformers import CrossEncoder
         self._model = CrossEncoder(model_name, device="cpu")
+        # Look the entailment index up by name: label order differs between NLI models
+        # (cross-encoder/nli-deberta-v3-* is 0=contradiction, 1=entailment, 2=neutral).
+        self._entail_idx = _label_index(self._model.config.id2label, "entailment")
 
     def score(self, claim: AlignedClaim, cited_docs: list[dict]) -> ScorerResult:
         t0 = time.perf_counter()
@@ -116,10 +127,10 @@ class NLIScorer:
                 cost_usd=0.0, deterministic=True,
             )
 
-        # premise = cited span, hypothesis = claim; label order: contradiction/neutral/entailment
+        # premise = cited span, hypothesis = claim
         logits = self._model.predict([(cited, claim.claim_text)])
         probs = _softmax(logits[0])
-        s = float(probs[2])  # entailment probability
+        s = float(probs[self._entail_idx])  # entailment probability
         s = max(0.0, min(1.0, s))
         return ScorerResult(
             claim_id=cid, method=self.name,
