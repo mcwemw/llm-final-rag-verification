@@ -36,6 +36,7 @@ REPO = HERE.parent
 SCHEMA_PATH = REPO / "schemas" / "answer_bundle.schema.json"
 OUT_DIR = HERE / "out"  # gitignored
 
+GROQ_MAX_RETRIES = 6
 LLM_MODEL = "openai/gpt-oss-120b"   # notebook: "groq:openai/gpt-oss-120b" via aisuite
 DEFAULT_TOP_K = 3
 TEMPERATURE = 0.2
@@ -59,7 +60,10 @@ def make_client():
             "（.env 不要 commit）。只想測檢索可加 --retrieve-only。"
         )
     from groq import Groq
-    return Groq(api_key=key, timeout=90.0, max_retries=1)
+    # Free-tier Groq returns 429 when several questions run back-to-back (per-minute limit).
+    # The SDK retries with exponential backoff and honours Retry-After; 1 retry was not enough
+    # (live demo 2026-11-27: 4/19 questions lost). Retrying does not change the model call.
+    return Groq(api_key=key, timeout=90.0, max_retries=GROQ_MAX_RETRIES)
 
 
 def call_llm(client, messages: list[dict], safe_api_error) -> tuple[str, dict]:
@@ -184,6 +188,7 @@ def main() -> None:
     client = None if args.retrieve_only else make_client()
     out_dir = Path(args.out)
     hits = total_in_kb = 0
+    failed: list[str] = []
     for it in items:
         results = kb.search(it["question"], args.top_k)
         expected_id = file_to_id.get(it["expected_file"])
@@ -204,6 +209,7 @@ def main() -> None:
                                     course.safe_api_error)
         except RuntimeError as exc:
             print(f"   ✗ {exc}")
+            failed.append(it["name"])
             continue
         note = course.citation_note(answer, results)
         bundle, unknown = to_answer_bundle(it["question"], answer, results)
@@ -237,6 +243,14 @@ def main() -> None:
         print(f"\n檢索命中率 hit@{args.top_k}：{hits}/{total_in_kb}（不含「應拒絕臆測」題）")
     if client is not None:
         print(f"輸出資料夾：{out_dir}")
+        done = len(items) - len(failed)
+        print(f"完成 {done}/{len(items)} 題" + (f"；失敗：{', '.join(failed)}" if failed else ""))
+    raise SystemExit(exit_code(failed))
+
+
+def exit_code(failed: list[str]) -> int:
+    """Non-zero when any question got no answer, so a partial run never looks complete."""
+    return 1 if failed else 0
 
 
 if __name__ == "__main__":

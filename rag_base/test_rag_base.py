@@ -101,3 +101,20 @@ class TestAnswerBundle:
         jsonschema = pytest.importorskip("jsonschema")
         b, _ = to_answer_bundle("q?", "見【doc_016】。", DOCS)
         jsonschema.validate(b, json.loads(SCHEMA_PATH.read_text(encoding="utf-8")))
+
+
+def test_partial_run_exits_nonzero_and_client_retries(monkeypatch):
+    import sys
+    import types
+    from rag_base import program2_answer as p2
+    assert p2.exit_code([]) == 0 and p2.exit_code(["q07"]) == 1
+    seen = {}
+
+    class FakeGroq:
+        def __init__(self, **kw):
+            seen.update(kw)
+
+    monkeypatch.setitem(sys.modules, "groq", types.SimpleNamespace(Groq=FakeGroq))
+    monkeypatch.setenv("GROQ_API_KEY", "test-key")
+    p2.make_client()
+    assert seen["max_retries"] == p2.GROQ_MAX_RETRIES >= 5
