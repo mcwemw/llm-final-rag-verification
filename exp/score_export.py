@@ -43,11 +43,15 @@ class ScoreExportError(ValueError):
     """Raised when an export violates score-export-v1 (fail-loud)."""
 
 
-def load_export(path_or_obj) -> dict:
+def load_export(path_or_obj, expected_dataset_version: Optional[str] = None,
+                expected_dataset_sha: Optional[str] = None) -> dict:
     """Load + validate an export HEADER. Raises ScoreExportError on any
     missing/invalid required field. Returns the parsed object.
 
-    Accepts a path (str) or an already-parsed dict (for tests)."""
+    Accepts a path (str) or an already-parsed dict (for tests).
+    expected_dataset_version / expected_dataset_sha (optional): schema §3 rule 5 —
+    reject an export computed on a different data version (ported from the
+    release/harness loader so the canonical ingest keeps that guard)."""
     if isinstance(path_or_obj, dict):
         obj = path_or_obj
     else:
@@ -83,6 +87,15 @@ def load_export(path_or_obj) -> dict:
 
     if not isinstance(obj["scores"], list) or not obj["scores"]:
         raise ScoreExportError("scores[] must be a non-empty list")
+
+    if expected_dataset_version is not None and obj["dataset_version"] != expected_dataset_version:
+        raise ScoreExportError(
+            f"dataset_version mismatch: export={obj['dataset_version']!r} "
+            f"expected={expected_dataset_version!r}")
+    if expected_dataset_sha is not None and obj.get("dataset_sha") != expected_dataset_sha:
+        raise ScoreExportError(
+            f"dataset_sha mismatch: export={obj.get('dataset_sha')!r} "
+            f"expected={expected_dataset_sha!r}")
 
     return obj
 
@@ -151,10 +164,15 @@ def coverage(prob_rows: list[dict]) -> float:
 
 
 def determinism_trusted(export: dict) -> bool:
-    """A rerun's determinism number is trustworthy only if sampling was reset.
-    selfcheck with rerun=true & samples_reset=false fakes Det-var=0."""
+    """Schema section 3 rule 4 (release semantics, decided 2026-11-27):
+    - rerun=false: determinism was not measured by this export -> False
+      (never carry over an earlier or cached determinism result);
+    - selfcheck with rerun=true & samples_reset=false fakes Det-var=0 -> False;
+    - otherwise True."""
     obj = load_export(export)
-    if obj.get("rerun") and obj["technique"] == "selfcheck":
+    if not obj.get("rerun"):
+        return False
+    if obj["technique"] == "selfcheck":
         return bool(obj.get("samples_reset", False))
     return True
 

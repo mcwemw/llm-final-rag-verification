@@ -41,6 +41,7 @@ import loader
 import gate
 import metrics
 import data_version
+import score_export
 
 RESULTS = os.path.join(os.path.dirname(__file__), "results")
 SEED = 20261021
@@ -74,6 +75,55 @@ def jaccard(a: str, b: str) -> float:
     return len(sa & sb) / len(sa | sb)
 
 
+def score_external(path, rows, cal_mask, ev, y, expected_dsv=None, expected_sha=None):
+    """Consume an external score-export-v1 JSON through the canonical ingest
+    (exp/score_export.py; no second parser). Fail-loud: header, direction, range,
+    pure response ids and id universe (= the rows the harness loaded), optional
+    dataset version / sha. Claim -> response aggregation = max p_hallu over
+    non-null claims; claim-level p_hallu kept in row["claim_scores"] for audit.
+    Then calibrate on the calibration half and score the eval half (as release/harness)."""
+    from collections import defaultdict
+    obj = score_export.load_export(path, expected_dataset_version=expected_dsv,
+                                   expected_dataset_sha=expected_sha)
+    universe = {str(r["id"]) for r in rows}
+    norm = score_export.to_hallucination_prob(obj, universe)   # raises on decorated / foreign ids
+    agg, claim_detail = defaultdict(list), defaultdict(list)
+    for s in norm:
+        claim_detail[s["bundle_id"]].append(
+            {"claim_id": s["claim_id"], "p_hallu": s["p_hallu"], "error": s["error"]})
+        if s["p_hallu"] is not None:
+            agg[s["bundle_id"]].append(s["p_hallu"])
+    p_by_bundle = {k: max(v) for k, v in agg.items()}
+
+    idmap = {str(r["id"]): i for i, r in enumerate(rows)}
+    matched = np.full(len(rows), np.nan)
+    for bid, p in p_by_bundle.items():
+        matched[idmap[bid]] = p
+    n_match = len(p_by_bundle)
+    have = ~np.isnan(matched)
+    faith = 1.0 - np.nan_to_num(matched, nan=0.5)   # high p_hallu -> low faith (harness convention)
+    cal, evh = cal_mask & have, ev & have
+    if cal.sum() == 0 or evh.sum() == 0:
+        print(f"  [export:{obj['technique']}] matched rows don't cover cal/eval split — skipped")
+        return None
+    t = calibrate_t(faith[cal], y[cal])
+    pred = (faith < t).astype(int)
+    m = metrics.prf(y[evh].tolist(), pred[evh].tolist())
+    m["kappa"] = metrics.cohen_kappa(y[evh].tolist(), pred[evh].tolist())
+
+    cov = score_export.coverage(norm)
+    det_note = "trusted" if score_export.determinism_trusted(obj) else "single/unverified"
+    row = _row(f"{obj['technique']} ({obj['model']}) [external]", m, 0.0, 0.0)
+    row["note"] = (f"external export run_id={obj['run_id']}; matched {n_match}/{len(rows)} rows; "
+                   f"coverage={cov:.2f}; determinism={det_note}; aggregation=response-max; "
+                   f"dataset={obj['dataset_version']}; direction={obj['score_direction']}")
+    row["claim_scores"] = dict(claim_detail)
+    print(f"  [export:{obj['technique']} ({obj['model']})] matched {n_match}/{len(rows)}, "
+          f"eval {int(evh.sum())}, t={t:.3f} F1={m['f1']:.3f} κ={m['kappa']:.3f} "
+          f"cov={cov:.2f} det={det_note}")
+    return row
+
+
 def _row(name, m, det_var, cost_usd, latency_ms="—"):
     return {
         "name": name,
@@ -99,6 +149,13 @@ def main():
                     help="SelfCheckGPT record cap (regenerates N samples each)")
     ap.add_argument("--sc-samples", type=int, default=3,
                     help="SelfCheckGPT stochastic samples per record")
+    ap.add_argument("--score-export", action="append", dest="score_export", metavar="PATH",
+                    help="score-export-v1 JSON from an external scorer; validated fail-loud by "
+                         "exp/score_export.py (canonical ingest); repeatable")
+    ap.add_argument("--dataset-version", default=None,
+                    help="assert each --score-export carries this dataset_version")
+    ap.add_argument("--dataset-sha", default=None,
+                    help="assert each --score-export carries this dataset_sha")
     ap.add_argument("--out", default=os.path.join(RESULTS, "harness.json"))
     args = ap.parse_args()
 
@@ -301,6 +358,14 @@ def main():
         })
         print(f"  [selfcheck] t={st:.3f} maj-F1={msc['f1']:.3f} κ={msc['kappa']:.3f} "
               f"det_var={det_sc:.2e}")
+
+    # ---- external score-export consumers (canonical ingest) -------------------
+    for xp in (args.score_export or []):
+        print(f"\n[export] loading {xp}")
+        r = score_external(xp, rows, cal_mask, ev, y, expected_dsv=args.dataset_version,
+                           expected_sha=args.dataset_sha)
+        if r:
+            result_rows.append(r)
 
     # ---- floors --------------------------------------------------------------
     if "emb" in techs:   # floors use same split as emb
