@@ -1,0 +1,39 @@
+{
+  "schema_version": "1.1",
+  "question": "what is the treatment when asset is discarded as per income tax act",
+  "answer": "Based on the provided passages, the treatment for an asset discarded as per the Income Tax Act is as follows:\n\n1. If an asset is discarded by a business without selling it, the scrap value of the asset can be reduced from the block of assets in the previous year in which the asset was discarded, as per Section 43(6) of the Income Tax Act.\n2. The block concept applies to all assets falling within the same class and subject to the same rate of depreciation, and any alterations to the value of the block must be made in accordance with the provisions of Chapter IV D of the Income Tax Act, 1961.\n3. If the assessee is entitled to claim depreciation on the residual value of a discarded asset, they can do so even if the asset is not used for business or professional purposes in the current year or subsequent years, as per Section 50(1) of the Income Tax Act.\n\nTherefore, the treatment for an asset discarded as per the Income Tax Act is to reduce the scrap value from the block of assets in the previous year, follow the block concept for calculating depreciation, and claim depreciation on the residual value of the discarded asset even if it is not used for business or professional purposes.",
+  "citations": [
+    {
+      "doc_id": "ragtruth-14445-p1",
+      "span_start": 10,
+      "span_end": 575,
+      "text": "For the purposes of Income Tax Act, a previous year is a distinct unit. In case an asset is discarded by the business but not sold, section 43(6) permits the scrap value of the asset to be reduced from the block in the previous year in which such asset is discarded.nder the block concept, all the assets falling within the same class and subject to same rate of depreciation are clubbed together and considered as single asset. Any alterations to the value of the block have to be strictly in accordance with the provisions of Chapter IV D of Income Tax Act, 1961."
+    },
+    {
+      "doc_id": "ragtruth-14445-p2",
+      "span_start": 587,
+      "span_end": 1305,
+      "text": "Illustration 4 Note: The purpose of this illustration is to assist in clarifying the meaning of the explanation toparagraph 13 of theStandard. Facts: 1. The income before depreciation and tax of an enterprise for 15 years is Rs. 1000 lakhs per year, both as per the booksof account and for income-tax purposes.2. The enterprise is subject to 100 percent tax-holiday for the first 10 years under section 80-IA.llustration 4 Note: The purpose of this illustration is to assist in clarifying the meaning of the explanation toparagraph 13 of theStandard. Facts: 1. The income before depreciation and tax of an enterprise for 15 years is Rs. 1000 lakhs per year, both as per the booksof account and for income-tax purposes."
+    },
+    {
+      "doc_id": "ragtruth-14445-p3",
+      "span_start": 1317,
+      "span_end": 1856,
+      "text": "Pavan Jain S. Depreciation – a non cash expenditure allowed under Income Tax Act, 1961 following block concept. Under the block concept, all the assets falling within the same class and subject to same rate of depreciation are clubbed together and considered as single asset.he assessee is entitled to claim depreciation on the residual value of such discarded asset [ie., Opening WDV of such asset less scrap value] even though such discarded asset is not used for the purposes of business or profession in such year and subsequent years."
+    }
+  ],
+  "retrieved": [
+    {
+      "doc_id": "ragtruth-14445-p1",
+      "text": "For the purposes of Income Tax Act, a previous year is a distinct unit. In case an asset is discarded by the business but not sold, section 43(6) permits the scrap value of the asset to be reduced from the block in the previous year in which such asset is discarded.nder the block concept, all the assets falling within the same class and subject to same rate of depreciation are clubbed together and considered as single asset. Any alterations to the value of the block have to be strictly in accordance with the provisions of Chapter IV D of Income Tax Act, 1961."
+    },
+    {
+      "doc_id": "ragtruth-14445-p2",
+      "text": "Illustration 4 Note: The purpose of this illustration is to assist in clarifying the meaning of the explanation toparagraph 13 of theStandard. Facts: 1. The income before depreciation and tax of an enterprise for 15 years is Rs. 1000 lakhs per year, both as per the booksof account and for income-tax purposes.2. The enterprise is subject to 100 percent tax-holiday for the first 10 years under section 80-IA.llustration 4 Note: The purpose of this illustration is to assist in clarifying the meaning of the explanation toparagraph 13 of theStandard. Facts: 1. The income before depreciation and tax of an enterprise for 15 years is Rs. 1000 lakhs per year, both as per the booksof account and for income-tax purposes."
+    },
+    {
+      "doc_id": "ragtruth-14445-p3",
+      "text": "Pavan Jain S. Depreciation – a non cash expenditure allowed under Income Tax Act, 1961 following block concept. Under the block concept, all the assets falling within the same class and subject to same rate of depreciation are clubbed together and considered as single asset.he assessee is entitled to claim depreciation on the residual value of such discarded asset [ie., Opening WDV of such asset less scrap value] even though such discarded asset is not used for the purposes of business or profession in such year and subsequent years."
+    }
+  ]
+}

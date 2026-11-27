@@ -1,0 +1,39 @@
+{
+  "schema_version": "1.1",
+  "question": "how does ez pass charges work",
+  "answer": "Based on the given passages, here's how E-Z Pass charges work:\n\nWhen you sign up for E-Z Pass, a certain amount (specifically $100 for the EZ-Tag or $25 for the TX-Tag) is charged to your credit card to establish a balance. As you drive through tolls, the system deducts the toll amounts from your balance until it reaches a certain threshold ($10 for the TX-Tag). When your balance falls below this threshold, your credit card is automatically charged again to increase your balance. This process continues until your account is closed or your balance is depleted.",
+  "citations": [
+    {
+      "doc_id": "ragtruth-15546-p1",
+      "span_start": 10,
+      "span_end": 337,
+      "text": "Report Abuse. Here, they charge a certain amount from your credit card to establish a balance (it's $100 for the EZ-Tag, $25 for the TX-Tag). They deduct the tolls from that balance till the balance goes below a certain value ($10 for the TX-Tag) and they charge your credit card another $100, or $25, to increase your balance."
+    },
+    {
+      "doc_id": "ragtruth-15546-p2",
+      "span_start": 349,
+      "span_end": 557,
+      "text": "E-ZPASS CUSTOMER WARNING – EMAIL PHISHING SCAM. If you received email that appears to be part of the E-ZPass Phishing Scam, we encourage you to file a complaint with the Internet Crime Complaint Center (IC3)."
+    },
+    {
+      "doc_id": "ragtruth-15546-p3",
+      "span_start": 569,
+      "span_end": 1007,
+      "text": "How does E-ZPass® work? As your vehicle enters the toll lane, the toll tag (1) that is mounted on your vehicle's windshield is read by the antennae (2). As your vehicle passes through, your E-ZPass® account is charged the proper amount. Feedback is provided to you on an electronic display (3). If your vehicle does not have a toll tag, the system classifies you as a violator and cameras take photos of your license plate for processing."
+    }
+  ],
+  "retrieved": [
+    {
+      "doc_id": "ragtruth-15546-p1",
+      "text": "Report Abuse. Here, they charge a certain amount from your credit card to establish a balance (it's $100 for the EZ-Tag, $25 for the TX-Tag). They deduct the tolls from that balance till the balance goes below a certain value ($10 for the TX-Tag) and they charge your credit card another $100, or $25, to increase your balance."
+    },
+    {
+      "doc_id": "ragtruth-15546-p2",
+      "text": "E-ZPASS CUSTOMER WARNING – EMAIL PHISHING SCAM. If you received email that appears to be part of the E-ZPass Phishing Scam, we encourage you to file a complaint with the Internet Crime Complaint Center (IC3)."
+    },
+    {
+      "doc_id": "ragtruth-15546-p3",
+      "text": "How does E-ZPass® work? As your vehicle enters the toll lane, the toll tag (1) that is mounted on your vehicle's windshield is read by the antennae (2). As your vehicle passes through, your E-ZPass® account is charged the proper amount. Feedback is provided to you on an electronic display (3). If your vehicle does not have a toll tag, the system classifies you as a violator and cameras take photos of your license plate for processing."
+    }
+  ]
+}

@@ -1,0 +1,39 @@
+{
+  "schema_version": "1.1",
+  "question": "what is dmso used for",
+  "answer": "Based on the given passages, DMSO is used for various purposes, including:\n\n1. Industrial uses: As an antifreeze and solvent for a wide range of chemicals.\n2. Medical uses: To relieve pain, reduce swelling and inflammation, promote healing, and treat a variety of medical ailments such as burns, scleroderma, and soft tissue damage.\n3. Pain relief: For muscles and joints, and as a general pain reliever applied to the skin.\n4. Skin care: To penetrate skin and tissue and enter the bloodstream.\n\nTherefore, the answer to the question \"What is DMSO used for?\" can be summarized as: DMSO is used for various industrial, medical, and personal care purposes, including pain relief, wound healing, and skin care.",
+  "citations": [
+    {
+      "doc_id": "ragtruth-15378-p1",
+      "span_start": 10,
+      "span_end": 298,
+      "text": "DMSO is dimethyl sulfoxide, a by-product in converting trees to paper. It has industrial uses as an antifreeze and as a solvent for a wide range of chemicals. There are also a wide range of medical uses. It has a remarkable capacity to penetrate skin and tissue and enter the bloodstream."
+    },
+    {
+      "doc_id": "ragtruth-15378-p2",
+      "span_start": 310,
+      "span_end": 745,
+      "text": "DMSO relieves pain, reduces swelling, inflammation and much more. See 30 DMSO uses, from burns to scleroderma, plus directions, side effects, safety. DMSO pain relief is most frequently for muscles and joints. Applied to the skin, DMSO is an excellent anti-inflammatory and has many uses as a general pain reliever. It has been used with varying degrees of success in a great variety of medical ailments. Possible applications include:"
+    },
+    {
+      "doc_id": "ragtruth-15378-p3",
+      "span_start": 757,
+      "span_end": 1016,
+      "text": "DMSO as long been used to promote healing. People who have it on hand often use it for minor cuts and burns and report that recovery is speedy. Several studies have documented DMSO use with soft tissue damage, local tissue death, skin ulcers, and burns.18-21."
+    }
+  ],
+  "retrieved": [
+    {
+      "doc_id": "ragtruth-15378-p1",
+      "text": "DMSO is dimethyl sulfoxide, a by-product in converting trees to paper. It has industrial uses as an antifreeze and as a solvent for a wide range of chemicals. There are also a wide range of medical uses. It has a remarkable capacity to penetrate skin and tissue and enter the bloodstream."
+    },
+    {
+      "doc_id": "ragtruth-15378-p2",
+      "text": "DMSO relieves pain, reduces swelling, inflammation and much more. See 30 DMSO uses, from burns to scleroderma, plus directions, side effects, safety. DMSO pain relief is most frequently for muscles and joints. Applied to the skin, DMSO is an excellent anti-inflammatory and has many uses as a general pain reliever. It has been used with varying degrees of success in a great variety of medical ailments. Possible applications include:"
+    },
+    {
+      "doc_id": "ragtruth-15378-p3",
+      "text": "DMSO as long been used to promote healing. People who have it on hand often use it for minor cuts and burns and report that recovery is speedy. Several studies have documented DMSO use with soft tissue damage, local tissue death, skin ulcers, and burns.18-21."
+    }
+  ]
+}

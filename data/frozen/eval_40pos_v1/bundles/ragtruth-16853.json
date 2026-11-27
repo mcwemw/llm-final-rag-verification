@@ -1,0 +1,39 @@
+{
+  "schema_version": "1.1",
+  "question": "differences and similarities between red and white blood cells",
+  "answer": "Based on the given passages, here are the differences and similarities between red and white blood cells:\n\nDifferences:\n\n* Function: Red blood cells are responsible for delivering oxygen from the lungs to the body's tissues, while white blood cells are part of the immune system and help combat diseases and infections.\n* Structure: Red blood cells have a unique biconcave disk shape that allows them to maximize their surface area for gas exchange, whereas white blood cells have a irregular, amoeba-like shape.\n\nSimilarities:\n\n* Formation: Both red and white blood cells are formed from pluripotent stem cells in the red bone marrow.\n* Presence in circulatory system: Both red and white blood cells are found in the circulatory system and can be carried by blood from one part of the body to another.\n* Cellular components: Both red and white blood cells have a cell membrane and cytoplasm.\n\nTherefore, while red and white blood cells have some similarities in terms of their formation and presence in the circulatory system, they differ in their function and structure.",
+  "citations": [
+    {
+      "doc_id": "ragtruth-12300-p1",
+      "span_start": 10,
+      "span_end": 583,
+      "text": "Shares & Saves. Save. Blood is made up of three parts: red cells, white cells and platelets. Red blood cells are responsible for the oxygen delivery from the lungs to the tissue in the body. White blood cells are a part of the immune system.These components circulate in the fluids in the blood vessels, which is pumped by the heart.hares & Saves. Save. Blood is made up of three parts: red cells, white cells and platelets. Red blood cells are responsible for the oxygen delivery from the lungs to the tissue in the body. White blood cells are a part of the immune system."
+    },
+    {
+      "doc_id": "ragtruth-12300-p2",
+      "span_start": 595,
+      "span_end": 1107,
+      "text": "1. Both red blood cells and white blood cells are found in blood. 2. Both red blood cells and white blood cells can be carried by blood from one part to other part of our body … .3.The red blood cells and the White Blood Cells can are found in the circulatory system. 4.It both have cell membrane and cytoplasm.hite blood cells are part of the Immune System and help the body combat disease, viruses, etc. Red blood cells are part of the Circulatory System and carry things such as oxy … gen throughout the body."
+    },
+    {
+      "doc_id": "ragtruth-12300-p3",
+      "span_start": 1119,
+      "span_end": 1400,
+      "text": "Best Answer: Similarities: - RBCs, WBCs are formed elements of blood. - RBCs, WBCs are formed from pluripotent stem cells in red bone marrow.est Answer: Similarities: - RBCs, WBCs are formed elements of blood. - RBCs, WBCs are formed from pluripotent stem cells in red bone marrow."
+    }
+  ],
+  "retrieved": [
+    {
+      "doc_id": "ragtruth-12300-p1",
+      "text": "Shares & Saves. Save. Blood is made up of three parts: red cells, white cells and platelets. Red blood cells are responsible for the oxygen delivery from the lungs to the tissue in the body. White blood cells are a part of the immune system.These components circulate in the fluids in the blood vessels, which is pumped by the heart.hares & Saves. Save. Blood is made up of three parts: red cells, white cells and platelets. Red blood cells are responsible for the oxygen delivery from the lungs to the tissue in the body. White blood cells are a part of the immune system."
+    },
+    {
+      "doc_id": "ragtruth-12300-p2",
+      "text": "1. Both red blood cells and white blood cells are found in blood. 2. Both red blood cells and white blood cells can be carried by blood from one part to other part of our body … .3.The red blood cells and the White Blood Cells can are found in the circulatory system. 4.It both have cell membrane and cytoplasm.hite blood cells are part of the Immune System and help the body combat disease, viruses, etc. Red blood cells are part of the Circulatory System and carry things such as oxy … gen throughout the body."
+    },
+    {
+      "doc_id": "ragtruth-12300-p3",
+      "text": "Best Answer: Similarities: - RBCs, WBCs are formed elements of blood. - RBCs, WBCs are formed from pluripotent stem cells in red bone marrow.est Answer: Similarities: - RBCs, WBCs are formed elements of blood. - RBCs, WBCs are formed from pluripotent stem cells in red bone marrow."
+    }
+  ]
+}

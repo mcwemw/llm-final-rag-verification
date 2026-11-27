@@ -1,0 +1,200 @@
+{
+  "name": "eval_40pos_v1",
+  "frozen": false,
+  "status": "candidate: pending team-lead review",
+  "seed": 20261127,
+  "sampling": "oversampled",
+  "target_claims": 150,
+  "faithful_share": 0.33,
+  "min_halluc_claims": 40,
+  "filters": {
+    "task_type": "QA",
+    "split": "test",
+    "quality": "good",
+    "exclude_example_source_ids": true,
+    "exclude_sources_sharing_question_or_passage_with_train": true,
+    "one_response_per_source_id": true,
+    "model_round_robin": true
+  },
+  "dropped_test_sources": {
+    "15112": [
+      "1 passage(s) also in train"
+    ],
+    "15317": [
+      "1 passage(s) also in train"
+    ]
+  },
+  "segmenter_rules_version": "1.0",
+  "counts": {
+    "responses": 32,
+    "claims_scored": 181,
+    "hallucinated_claims": 40,
+    "PASS": 141,
+    "FAIL": 4,
+    "UNSOURCED": 36
+  },
+  "prevalence": {
+    "in_sample": 0.221,
+    "natural_test_pool": 0.067,
+    "w1": 0.3033,
+    "w0": 1.1976
+  },
+  "strata": [
+    {
+      "model": "gpt-3.5-turbo-0613",
+      "response_label": "faithful",
+      "pool_responses": 134,
+      "sampled_responses": 2,
+      "inclusion_fraction": 0.0149,
+      "weight": 67.0
+    },
+    {
+      "model": "gpt-3.5-turbo-0613",
+      "response_label": "hallucinated",
+      "pool_responses": 5,
+      "sampled_responses": 5,
+      "inclusion_fraction": 1.0,
+      "weight": 1.0
+    },
+    {
+      "model": "gpt-4-0613",
+      "response_label": "faithful",
+      "pool_responses": 147,
+      "sampled_responses": 2,
+      "inclusion_fraction": 0.0136,
+      "weight": 73.5
+    },
+    {
+      "model": "gpt-4-0613",
+      "response_label": "hallucinated",
+      "pool_responses": 1,
+      "sampled_responses": 1,
+      "inclusion_fraction": 1.0,
+      "weight": 1.0
+    },
+    {
+      "model": "llama-2-13b-chat",
+      "response_label": "faithful",
+      "pool_responses": 113,
+      "sampled_responses": 2,
+      "inclusion_fraction": 0.0177,
+      "weight": 56.5
+    },
+    {
+      "model": "llama-2-13b-chat",
+      "response_label": "hallucinated",
+      "pool_responses": 35,
+      "sampled_responses": 5,
+      "inclusion_fraction": 0.1429,
+      "weight": 7.0
+    },
+    {
+      "model": "llama-2-70b-chat",
+      "response_label": "faithful",
+      "pool_responses": 114,
+      "sampled_responses": 1,
+      "inclusion_fraction": 0.0088,
+      "weight": 114.0
+    },
+    {
+      "model": "llama-2-70b-chat",
+      "response_label": "hallucinated",
+      "pool_responses": 33,
+      "sampled_responses": 4,
+      "inclusion_fraction": 0.1212,
+      "weight": 8.25
+    },
+    {
+      "model": "llama-2-7b-chat",
+      "response_label": "faithful",
+      "pool_responses": 96,
+      "sampled_responses": 1,
+      "inclusion_fraction": 0.0104,
+      "weight": 96.0
+    },
+    {
+      "model": "llama-2-7b-chat",
+      "response_label": "hallucinated",
+      "pool_responses": 51,
+      "sampled_responses": 4,
+      "inclusion_fraction": 0.0784,
+      "weight": 12.75
+    },
+    {
+      "model": "mistral-7B-instruct",
+      "response_label": "faithful",
+      "pool_responses": 105,
+      "sampled_responses": 1,
+      "inclusion_fraction": 0.0095,
+      "weight": 105.0
+    },
+    {
+      "model": "mistral-7B-instruct",
+      "response_label": "hallucinated",
+      "pool_responses": 29,
+      "sampled_responses": 4,
+      "inclusion_fraction": 0.1379,
+      "weight": 7.25
+    }
+  ],
+  "leakage": {
+    "response_id_overlap_with_calib_v1": 0,
+    "source_id_overlap_with_calib_v1": 0,
+    "question_overlap_with_calib_v1": 0,
+    "document_overlap_with_calib_v1": 0,
+    "document_overlap_with_train": 0,
+    "split_of_every_response": [
+      "test"
+    ],
+    "one_response_per_source_id": true
+  },
+  "inputs": {
+    "response.jsonl": "e4c2e4ac24fff676d8984cc61c35d791612fadc58015335d97dd632375e18073",
+    "source_info.jsonl": "0dffc26ea9f3c1c3d7c7e8336b56ef1646e3cec876edffcca3c9c624d12d578b",
+    "calib_v1/responses.jsonl": "47d81efa7a37dcd8680df5a10172e361c5b3c2c248adf41bc989b6ee1ab2af6e"
+  },
+  "code": {
+    "tools/build_eval_set.py": "fa4589ce0f8d1c3a53eaf0af1f0158912a89c816faf2f311b108f0dc754bdf1a",
+    "tools/build_calib_subset.py": "469aaae9ba524c4dcb2cb271ea9ad6e283fc8114d3ea50ae720009717c67ab9e",
+    "tools/segment.py": "701aa2dfb4064d2eaa21544deab3ff7ba8a2db89bbb030de2094ea6f9f079894",
+    "tools/generate_examples.py": "477c973bb8411537ec985592ef88d72e943244add60b6a433cef800733bb8d7b"
+  },
+  "outputs": {
+    "POSITIVES_REVIEW.md": "cbba39bb984db3f53c241f9efd85f34d769c38986e52166223e52b011d0411d5",
+    "STATS.md": "a4b23c02394b9aa41329306d7996941811febec71296dc3739c4ed12e3f405e1",
+    "bundles/ragtruth-11908.json": "37b49c029a45a674bebdbebc81d89e871482be149cf7f0a0e5bed036beec4262",
+    "bundles/ragtruth-12016.json": "7f1d8cf2277c124c159d15476163b4f615e6788aa05e9dbcd3302dee57781178",
+    "bundles/ragtruth-12518.json": "8080dbb4be9e05db3cd8cf9f3b96027c15ecdc96db7e765cb22c6a753c4f91f2",
+    "bundles/ragtruth-12602.json": "74f81a4c8ab6140c9163afcf681e8e2a9dbd1ce8331427dfe9bdaec6e9f96d2c",
+    "bundles/ragtruth-12765.json": "0961ccffe875d59a26cce97471996be6a1c88977b00caa86c6ab0eab7f716adb",
+    "bundles/ragtruth-13105.json": "886104592d37a516deeb31347d63f26a048e78ee0a864a35211c4c2644674cf1",
+    "bundles/ragtruth-13136.json": "5cc573540f08a5464ab37776786244e4ba6efd7d92f739d74b8c41ca00994193",
+    "bundles/ragtruth-13155.json": "3eac3b900c10a866df13f5d796a627b0f6a09cee4ca85aa96e6a60a61ac51431",
+    "bundles/ragtruth-13363.json": "384400cbd462eabe5cb9f1d72bdc6e7436f7cfa46d68b3f1b8a0d3fc5b538ee5",
+    "bundles/ragtruth-13560.json": "f4132a1b2eb475f645850b42bb84166590b15f19368d862f77929ff5333aa522",
+    "bundles/ragtruth-14007.json": "059f0c42ce46364642605e04a4f7445351a6266d89fa34c4764885fca89245d3",
+    "bundles/ragtruth-14131.json": "99629c6913fc32261244c899c34a6a015fffd77701f0bdffc7c59786c475ca02",
+    "bundles/ragtruth-14293.json": "589ce96ed05d427c077332d4e2b8ff12d4604d9e625f06bae89c229c34e05876",
+    "bundles/ragtruth-14323.json": "d7b2b413a448cfb41d4775db64510891f160935d0136b3cf33610139e2122d1c",
+    "bundles/ragtruth-14747.json": "8df10caeed4b4590532a85c89bc8d2d18131f2fa79734108bece5656b640f087",
+    "bundles/ragtruth-14806.json": "d68839e313eb550c1f703944f5fac3d42d3544f86a3126fc4d03374f6fc5b9a6",
+    "bundles/ragtruth-14846.json": "826a1b84c8472128e7b3f002d66684ffd01d2cb134668787a8b99f60bc14515b",
+    "bundles/ragtruth-15010.json": "926e3a11729c978d1d3b9bc2ce1e5dd209aa9a275687a2f14a396406fed0a4ef",
+    "bundles/ragtruth-15174.json": "fefe6bbcf048043d7fe07e9a528e5646a2b54b44ac0e6adec38fc332fc0e9a8b",
+    "bundles/ragtruth-15343.json": "79a99ca15f4ecd6277f8c465e1019d7af36f3c2eb62236f3b28e7c115b85fa48",
+    "bundles/ragtruth-15677.json": "4de882f6b951646c0a92e2d7916df2e294c119007bb1a4fefaf8c33c4dfd783c",
+    "bundles/ragtruth-15688.json": "92d665d87056a5c348a53db7f85fa503b8a468a31498c2d26b808d5a23ec63fe",
+    "bundles/ragtruth-15735.json": "9eaa4250900bdd125da0597dba924276b6873dec1d81d2fd26310704ed244c6e",
+    "bundles/ragtruth-15755.json": "0049376f879fed480c9e9ed418ad1d066ba8a7fe1621db5b6dfe8d4404d09b42",
+    "bundles/ragtruth-15925.json": "2449272fae7c89c3611e278c3bb5edb4a2a99ea979f4cf536504225bfee3ef8d",
+    "bundles/ragtruth-16056.json": "209d259c3e1684e1e03f0f0c3b4fb5eb410d4eee19db4ad43ed9caaa5f388ce0",
+    "bundles/ragtruth-16510.json": "68eb4db8f05c4da42e19dcdfbcd2d410a04312f62a2590515acad45e5b28a4cb",
+    "bundles/ragtruth-16853.json": "ba34dd91722dab9a5f7858b1cf9c2b4e4ce514ad2e201f63bd074b738874afb2",
+    "bundles/ragtruth-16895.json": "0bac5f0ded2bf4a6e7b68d51eab6323871e403a7d04063d8be5216dcba3d959b",
+    "bundles/ragtruth-17056.json": "29f2cf4289d049a19a7e020b6ee8acbc65c2107b8b8b05971257aadeb0aa6c33",
+    "bundles/ragtruth-17253.json": "eb143f5f411c9067c48883d0edb56ce675fca529ee3a325dbd699d7b0c93c758",
+    "bundles/ragtruth-17570.json": "62edb060bbd8680b313b70695dcbb8423417f9efa7de6a325fefe7c825265b47",
+    "claims.jsonl": "64db2ae081ed50310f799f633cf4f832bcebdfff21a9a6574a77f583694013ed",
+    "responses.jsonl": "34a44ef3e33e63d6aa0ff463bed576698592c8e3dae118a54d90a09df3ffdadc"
+  }
+}

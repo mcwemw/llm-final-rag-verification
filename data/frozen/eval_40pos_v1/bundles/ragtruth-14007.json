@@ -1,0 +1,39 @@
+{
+  "schema_version": "1.1",
+  "question": "difference between an adverb clause and an adjective clause",
+  "answer": "Based on the provided passages, the main difference between an adverb clause and an adjective clause is as follows:\n\n* An adverb clause is a dependent clause that modifies a verb, adjective, or another adverb. It is introduced by subordinate conjunctions such as after, although, as, as if, before, because, if, since, so that, than, though, unless, until, when, where, and while. (Passage 1)\n* An adjective clause, on the other hand, is a dependent clause that modifies a noun or a pronoun. It is introduced by a relative pronoun (who, whose, him, her, it, that) or a subordinate conjunction (when and where). (Passage 2)\n\nIn summary, while both adverb clauses and adjective clauses are dependent clauses, they differ in their function and the words that introduce them. Adverb clauses modify verbs, adjectives, or another adverbs, while adjective clauses modify nouns or pronouns.",
+  "citations": [
+    {
+      "doc_id": "ragtruth-15254-p1",
+      "span_start": 10,
+      "span_end": 315,
+      "text": "An adverb clause is a dependent clause that modifies a verb, adjective or another adverb. It usually modifies the verb. Adverb clauses are introduced by subordinate conjunctions including after, although, as, as if, before, because, if, since, so that, than, though, unless, until, when, where, and while."
+    },
+    {
+      "doc_id": "ragtruth-15254-p2",
+      "span_start": 327,
+      "span_end": 644,
+      "text": "Parts of the Sentence - Adjective, Adverb, and Noun Clauses. The adjective clause is used to modify a noun or a pronoun. It will begin with a relative pronoun (who, whose, whom, which, and that) or a subordinate conjunction (when and where). Those are the only words that can be used to introduce an adjective clause."
+    },
+    {
+      "doc_id": "ragtruth-15254-p3",
+      "span_start": 656,
+      "span_end": 909,
+      "text": "Adjective Clauses. Adjective clauses are dependent clauses that modify nouns or pronouns. Much like adverbial clauses, students who are trying to identify adjective clauses should try to determine what kinds of questions the clause in questions answers."
+    }
+  ],
+  "retrieved": [
+    {
+      "doc_id": "ragtruth-15254-p1",
+      "text": "An adverb clause is a dependent clause that modifies a verb, adjective or another adverb. It usually modifies the verb. Adverb clauses are introduced by subordinate conjunctions including after, although, as, as if, before, because, if, since, so that, than, though, unless, until, when, where, and while."
+    },
+    {
+      "doc_id": "ragtruth-15254-p2",
+      "text": "Parts of the Sentence - Adjective, Adverb, and Noun Clauses. The adjective clause is used to modify a noun or a pronoun. It will begin with a relative pronoun (who, whose, whom, which, and that) or a subordinate conjunction (when and where). Those are the only words that can be used to introduce an adjective clause."
+    },
+    {
+      "doc_id": "ragtruth-15254-p3",
+      "text": "Adjective Clauses. Adjective clauses are dependent clauses that modify nouns or pronouns. Much like adverbial clauses, students who are trying to identify adjective clauses should try to determine what kinds of questions the clause in questions answers."
+    }
+  ]
+}

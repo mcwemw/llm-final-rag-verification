@@ -1,0 +1,39 @@
+{
+  "schema_version": "1.1",
+  "question": "how to grill pork chops, allrecipes.com",
+  "answer": "To grill pork chops according to allrecipes.com, start by preheating an outdoor grill for medium heat and lightly oil the grate. In a bowl, mix together the seasoned salt, black pepper, garlic powder, onion powder, paprika, Worcestershire sauce, and smoke flavoring until thoroughly combined. Rinse the pork chops, and sprinkle the wet chops on both sides with the spice mixture. With your hands, massage the spice rub into the meat and allow to stand for 10 minutes. Finally, grill the chops over indirect heat until no longer pink inside, about 12 minutes per side.",
+  "citations": [
+    {
+      "doc_id": "ragtruth-15180-p1",
+      "span_start": 10,
+      "span_end": 328,
+      "text": "1 Preheat an outdoor grill for medium heat, and lightly oil the grate.  In a bowl, mix together the seasoned salt, black pepper, garlic powder, onion powder, paprika, Worcestershire sauce, and smoke flavoring until thoroughly combined. Rinse pork chops, and sprinkle the wet chops on both sides with the spice mixture."
+    },
+    {
+      "doc_id": "ragtruth-15180-p2",
+      "span_start": 340,
+      "span_end": 600,
+      "text": "3) Oven-Fried Pork Chops. The secret ingredient in this top-rated recipe is stuffing mix for the breading! The pork chops come out tender and juicy. Perfect for a busy weeknight, these tasty chops are ready in just 30 minutes. It takes just 10 minutes to prep."
+    },
+    {
+      "doc_id": "ragtruth-15180-p3",
+      "span_start": 612,
+      "span_end": 873,
+      "text": "1 Rinse pork chops, and sprinkle the wet chops on both sides with the spice mixture. With your hands, massage the spice rub into the meat; allow to stand for 10 minutes.  Grill the chops over indirect heat until no longer pink inside, about 12 minutes per side."
+    }
+  ],
+  "retrieved": [
+    {
+      "doc_id": "ragtruth-15180-p1",
+      "text": "1 Preheat an outdoor grill for medium heat, and lightly oil the grate.  In a bowl, mix together the seasoned salt, black pepper, garlic powder, onion powder, paprika, Worcestershire sauce, and smoke flavoring until thoroughly combined. Rinse pork chops, and sprinkle the wet chops on both sides with the spice mixture."
+    },
+    {
+      "doc_id": "ragtruth-15180-p2",
+      "text": "3) Oven-Fried Pork Chops. The secret ingredient in this top-rated recipe is stuffing mix for the breading! The pork chops come out tender and juicy. Perfect for a busy weeknight, these tasty chops are ready in just 30 minutes. It takes just 10 minutes to prep."
+    },
+    {
+      "doc_id": "ragtruth-15180-p3",
+      "text": "1 Rinse pork chops, and sprinkle the wet chops on both sides with the spice mixture. With your hands, massage the spice rub into the meat; allow to stand for 10 minutes.  Grill the chops over indirect heat until no longer pink inside, about 12 minutes per side."
+    }
+  ]
+}

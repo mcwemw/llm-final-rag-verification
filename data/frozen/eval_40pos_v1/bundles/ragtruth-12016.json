@@ -1,0 +1,39 @@
+{
+  "schema_version": "1.1",
+  "question": "what is the difference between tartate and succinate",
+  "answer": "Based on the provided passages, the main differences between tartrate and succinate are:\n\n1. Duration of action: Succinate (Toprol) is a long-acting form of metoprolol, while tartrate (Lopressor) is a shorter-acting form.\n2. Release time: Succinate stays in the bloodstream for 24 hours, while tartrate does not last as long and needs to be taken at regular intervals.\n3. Side effects: Succinate has a greater dehydrating effect, leading to constipation and dry mouth, while tartrate may cause diarrhea and sleep issues like insomnia or unusual dreams.\n\nTherefore, the main difference between tartrate and succinate is the duration of action and the side effects they produce.",
+  "citations": [
+    {
+      "doc_id": "ragtruth-14318-p1",
+      "span_start": 10,
+      "span_end": 547,
+      "text": "9. Get help from a doctor now ›. Medication duration: Succinate (toprol) is the long acting form of metoprolol where as tartrate (lopressor) is the shorter acting form. Toprol can be taken once a day and Lopressor is usually taken at least twice a day....Read more.Great you're all set!. Get help from a doctor now ›. Medication duration: Succinate (toprol) is the long acting form of metoprolol where as tartrate (lopressor) is the shorter acting form. Toprol can be taken once a day and Lopressor is usually taken at least twice a day."
+    },
+    {
+      "doc_id": "ragtruth-14318-p2",
+      "span_start": 559,
+      "span_end": 1138,
+      "text": "Tartrate vs Succinate. The key difference between tartrate and succinate is that succinate is derived from the succinic acid and tartrate is derived from the tartaric acid. These two chemical substances are widely used in the beverage industry and drug manufacturing.Succinic acid is ethan-1,2-dicarboxylic acid. Succinate form of metoprolol is an extended release drug and it plays its role in the circulatory system for 24 hours. However, the tartrate form of metoprolol does not appear in the blood stream for 24 hours because metoprolol tartrate is an immediate-release drug."
+    },
+    {
+      "doc_id": "ragtruth-14318-p3",
+      "span_start": 1150,
+      "span_end": 1867,
+      "text": "Release time. The primary difference between metoprolol succinate and metoprolol tartrate is the length of time that the drugs stay in your bloodstream. Metoprolol succinate will stay in a person's bloodstream for 24 complete hours. This means that the medication is a once per day pill.Metoprolol tartrate, on the other hand, will not stay in the bloodstream as long and thus needs to be taken at regular intervals.etoprolol succinate has a greater dehydrating effect. Thus, the side effects constipation and dry mouth are primarily associated with this version of the medication. Conversely, metoprolol tartrate may cause diarrhea. It also has the potential to cause sleep issues such as insomnia or unusual dreams."
+    }
+  ],
+  "retrieved": [
+    {
+      "doc_id": "ragtruth-14318-p1",
+      "text": "9. Get help from a doctor now ›. Medication duration: Succinate (toprol) is the long acting form of metoprolol where as tartrate (lopressor) is the shorter acting form. Toprol can be taken once a day and Lopressor is usually taken at least twice a day....Read more.Great you're all set!. Get help from a doctor now ›. Medication duration: Succinate (toprol) is the long acting form of metoprolol where as tartrate (lopressor) is the shorter acting form. Toprol can be taken once a day and Lopressor is usually taken at least twice a day."
+    },
+    {
+      "doc_id": "ragtruth-14318-p2",
+      "text": "Tartrate vs Succinate. The key difference between tartrate and succinate is that succinate is derived from the succinic acid and tartrate is derived from the tartaric acid. These two chemical substances are widely used in the beverage industry and drug manufacturing.Succinic acid is ethan-1,2-dicarboxylic acid. Succinate form of metoprolol is an extended release drug and it plays its role in the circulatory system for 24 hours. However, the tartrate form of metoprolol does not appear in the blood stream for 24 hours because metoprolol tartrate is an immediate-release drug."
+    },
+    {
+      "doc_id": "ragtruth-14318-p3",
+      "text": "Release time. The primary difference between metoprolol succinate and metoprolol tartrate is the length of time that the drugs stay in your bloodstream. Metoprolol succinate will stay in a person's bloodstream for 24 complete hours. This means that the medication is a once per day pill.Metoprolol tartrate, on the other hand, will not stay in the bloodstream as long and thus needs to be taken at regular intervals.etoprolol succinate has a greater dehydrating effect. Thus, the side effects constipation and dry mouth are primarily associated with this version of the medication. Conversely, metoprolol tartrate may cause diarrhea. It also has the potential to cause sleep issues such as insomnia or unusual dreams."
+    }
+  ]
+}

@@ -1,0 +1,39 @@
+{
+  "schema_version": "1.1",
+  "question": "how are forest fires beneficial to conifers like jack pines?",
+  "answer": "Forest fires are beneficial to conifers like jack pines because they help in the regeneration of the forest. Fires consume dead and decaying vegetation, clearing the way for new growth. Jack pines rely on fire to spread their seeds. They produce seratonous (resin-filled) cones that remain dormant until a fire occurs and melts the resin, causing the cones to open and the seeds to fall or blow out. Furthermore, fires can disrupt the growth of other trees like spruce, providing an advantage to the more fire-tolerant jack pines and allowing them to proliferate.",
+  "citations": [
+    {
+      "doc_id": "ragtruth-15450-p1",
+      "span_start": 10,
+      "span_end": 186,
+      "text": "A compensating resumption of fast growth returns to the pine sapling around age seven. 1  List. 2  Article. 3  Article. 4  List. 5  Article. 6  Article. 7  Article. 8  Article."
+    },
+    {
+      "doc_id": "ragtruth-15450-p2",
+      "span_start": 198,
+      "span_end": 781,
+      "text": "Fire is the mechanism by which the forest is continually regenerated, states Hall. Fires consume dead, decaying vegetation accumulating on the forest floor, thereby clearing the way for new growth. Some species, such as the jack pine, even rely on fire to spread their seeds. The jack pine produces seratonous (resin-filled) cones that are very durable. The cones remain dormant until a fire occurs and melts the resin. Then the cones pop open and the seeds fall or blow out. In the Canadian boreal forest, aspen and jack pine are the most important ‘pioneer species’, observes Hall."
+    },
+    {
+      "doc_id": "ragtruth-15450-p3",
+      "span_start": 793,
+      "span_end": 1132,
+      "text": "Spruce have better access to sunlight while shading the other trees with their more dense canopies. Consequently, the jack pine and aspen begin dying out in regions where spruce trees are plentiful. But, should another fire come and disturb this cycle, the more fire-tolerant jack pine and aspen regain the advantage and again proliferate."
+    }
+  ],
+  "retrieved": [
+    {
+      "doc_id": "ragtruth-15450-p1",
+      "text": "A compensating resumption of fast growth returns to the pine sapling around age seven. 1  List. 2  Article. 3  Article. 4  List. 5  Article. 6  Article. 7  Article. 8  Article."
+    },
+    {
+      "doc_id": "ragtruth-15450-p2",
+      "text": "Fire is the mechanism by which the forest is continually regenerated, states Hall. Fires consume dead, decaying vegetation accumulating on the forest floor, thereby clearing the way for new growth. Some species, such as the jack pine, even rely on fire to spread their seeds. The jack pine produces seratonous (resin-filled) cones that are very durable. The cones remain dormant until a fire occurs and melts the resin. Then the cones pop open and the seeds fall or blow out. In the Canadian boreal forest, aspen and jack pine are the most important ‘pioneer species’, observes Hall."
+    },
+    {
+      "doc_id": "ragtruth-15450-p3",
+      "text": "Spruce have better access to sunlight while shading the other trees with their more dense canopies. Consequently, the jack pine and aspen begin dying out in regions where spruce trees are plentiful. But, should another fire come and disturb this cycle, the more fire-tolerant jack pine and aspen regain the advantage and again proliferate."
+    }
+  ]
+}

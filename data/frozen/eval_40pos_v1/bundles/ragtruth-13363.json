@@ -1,0 +1,39 @@
+{
+  "schema_version": "1.1",
+  "question": "how to wash wine glasses properly",
+  "answer": "To wash wine glasses properly, follow these steps:\n1. Lay a towel in the sink and fill it with hot water.\n2. Wash one wine glass at a time to avoid damage.\n3. Use a small amount of mild detergent and apply it only to the bottom of the glass and around the rim.\n4. Scrub the inside of the glass with a stemware brush that has soft-foam bristles.\n5. Rinse the glass thoroughly with hot water.\n6. If there is stubborn wine residue, dissolve a small amount of baking soda in hot water and let it stand in the glass for a few minutes.\n7. Gently scrub the glass again with the stemware brush.\n8. Rinse the glass once more with hot water.\n9. Dry the wine glasses with a smooth lint-free cloth, such as a microfiber or flour sack towel.\n10. Make sure to dry them completely to avoid any stains or spots.",
+  "citations": [
+    {
+      "doc_id": "ragtruth-15147-p1",
+      "span_start": 10,
+      "span_end": 292,
+      "text": "1 If hot water and mild detergent can’t get your glasses clean, use baking soda to remove any stubborn wine residue. 2  Dissolve a small amount of soda with hot water and let it stand in the glass for a few minutes. 3  The soda will dissolve any residual wine adhering to the glass."
+    },
+    {
+      "doc_id": "ragtruth-15147-p2",
+      "span_start": 304,
+      "span_end": 581,
+      "text": "3. To clean the inside of a glass, use a stemware brush with soft-foam bristles. 4. After rinsing thoroughly with hot water, dry the wine glasses with a smooth lint-free cloth, such as a microfiber or flour sack towel. Editor's Tip: Red wine can leave stains if left overnight."
+    },
+    {
+      "doc_id": "ragtruth-15147-p3",
+      "span_start": 593,
+      "span_end": 1097,
+      "text": "Clean Your Wine Glasses by Hand. The safest cleaning method for your wine glasses is to scrub them by hand. Follow these tips to avoid chips and spots. 1. Lay a towel in the sink before filling with hot water. Wash one wine glass at a time to avoid damage. 2. To keep soap from flavoring your next glass of wine, use a small amount of detergent and use it only where it's needed -- in the bottom of the glass and around the rim. Cradle the bowl of the glass in one hand while washing to protect the stem."
+    }
+  ],
+  "retrieved": [
+    {
+      "doc_id": "ragtruth-15147-p1",
+      "text": "1 If hot water and mild detergent can’t get your glasses clean, use baking soda to remove any stubborn wine residue. 2  Dissolve a small amount of soda with hot water and let it stand in the glass for a few minutes. 3  The soda will dissolve any residual wine adhering to the glass."
+    },
+    {
+      "doc_id": "ragtruth-15147-p2",
+      "text": "3. To clean the inside of a glass, use a stemware brush with soft-foam bristles. 4. After rinsing thoroughly with hot water, dry the wine glasses with a smooth lint-free cloth, such as a microfiber or flour sack towel. Editor's Tip: Red wine can leave stains if left overnight."
+    },
+    {
+      "doc_id": "ragtruth-15147-p3",
+      "text": "Clean Your Wine Glasses by Hand. The safest cleaning method for your wine glasses is to scrub them by hand. Follow these tips to avoid chips and spots. 1. Lay a towel in the sink before filling with hot water. Wash one wine glass at a time to avoid damage. 2. To keep soap from flavoring your next glass of wine, use a small amount of detergent and use it only where it's needed -- in the bottom of the glass and around the rim. Cradle the bowl of the glass in one hand while washing to protect the stem."
+    }
+  ]
+}
