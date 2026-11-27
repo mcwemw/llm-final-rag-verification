@@ -4,7 +4,7 @@ import json
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-EVAL = ROOT / "data" / "frozen" / "eval_40pos_v1"
+EVAL = ROOT / "data" / "frozen" / "eval_40pos_v1.1"
 CALIB = ROOT / "data" / "frozen" / "calib_v1"
 
 
@@ -20,11 +20,12 @@ def test_manifest_hashes_match_files():
         assert hashlib.sha256((EVAL / rel).read_bytes()).hexdigest() == digest, rel
 
 
-def test_at_least_40_positives_and_counts_agree():
+def test_at_least_40_valid_positives_and_counts_agree():
     m = json.loads((EVAL / "manifest.json").read_text())
     inc = [c for c in rows(EVAL / "claims.jsonl") if not c["excluded"]]
     assert sum(c["y_true"] for c in inc) == m["counts"]["hallucinated_claims"] >= 40
     assert len(inc) == m["counts"]["claims_scored"]
+    assert m["gold_rules_version"] == "1.1" and m["frozen"] is False
 
 
 def test_disjoint_from_calib_v1():

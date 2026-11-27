@@ -1,0 +1,39 @@
+{
+  "schema_version": "1.1",
+  "question": "typical weather in indiana",
+  "answer": "Based on the given passages, here's the typical weather in Indiana:\n\nPassage 1 provides information on snowfall in Indianapolis, Fort Wayne, Gary, and South Bend. According to the passage, Indianapolis receives an average of 17 inches of snow per year, with the most snow falling in January (7.3 inches). Fort Wayne receives an average of 35 inches of snow per year, with the most snow falling in February (12.3 inches). Gary receives an average of 24 inches of snow per year, with the most snow falling in January (9.5 inches). South Bend receives an average of 31 inches of snow per year, with the most snow falling in February (10.5 inches).\n\nPassage 2 describes the average weather conditions in Indianapolis throughout the year. The summer months are hot and humid, with temperatures ranging from 70°F to 90°F (21°C to 32°C). The winter months are chilly and windy, with temperatures ranging from 15°F to 35°F (-9°C to 1°C). The year-round average temperature is around 50°F (10°C).\n\nPassage 3 provides information on the wettest and driest years in Indiana. The wettest year on record was 1876, with 57.65 inches of measured rain in Indianapolis. The driest year was 1934, with 24.97 inches of measured rain in Indianapolis.\n\nBased on these passages, we can conclude that the typical weather in Indiana is characterized by hot and humid summers, chilly and windy winters, and significant precipitation throughout the year. The state experiences a moderate amount of snowfall, with the most snow falling in January and February.",
+  "citations": [
+    {
+      "doc_id": "ragtruth-14394-p1",
+      "span_start": 10,
+      "span_end": 318,
+      "text": "When, how much and how often Indianapolis, Indiana has snow — with monthly and yearly averages for total days and inches of snowfall, snow accumulation, heavy snowstorms and first snowfall. Snowfall and snow accumulation averages for: Fort Wayne Gary & Michigan City South Bend. Hot, Humid Weather in Indiana"
+    },
+    {
+      "doc_id": "ragtruth-14394-p2",
+      "span_start": 330,
+      "span_end": 635,
+      "text": "Average Weather in Indianapolis Indiana, United States. In Indianapolis, the summers are long, warm, humid, and wet; the winters are chilly and windy; and it is partly cloudy year round. Over the course of the year, the temperature typically varies from 22°F to 85°F and is rarely below 3°F or above 92°F."
+    },
+    {
+      "doc_id": "ragtruth-14394-p3",
+      "span_start": 647,
+      "span_end": 973,
+      "text": "Wettest year was recorded in 1876 at Indianapolis : 57.65 inches of measured rain. 1  Driest year was recorded in 1934 at Indianapolis : 24.97 inches of measured rain. 2  Most snow fall recorded in 1979 in Rockford : 74.5 inches in one season. 3  Maximum monthly precipitation: over 16 inches in July 2003 and 2004 at Kokomo ."
+    }
+  ],
+  "retrieved": [
+    {
+      "doc_id": "ragtruth-14394-p1",
+      "text": "When, how much and how often Indianapolis, Indiana has snow — with monthly and yearly averages for total days and inches of snowfall, snow accumulation, heavy snowstorms and first snowfall. Snowfall and snow accumulation averages for: Fort Wayne Gary & Michigan City South Bend. Hot, Humid Weather in Indiana"
+    },
+    {
+      "doc_id": "ragtruth-14394-p2",
+      "text": "Average Weather in Indianapolis Indiana, United States. In Indianapolis, the summers are long, warm, humid, and wet; the winters are chilly and windy; and it is partly cloudy year round. Over the course of the year, the temperature typically varies from 22°F to 85°F and is rarely below 3°F or above 92°F."
+    },
+    {
+      "doc_id": "ragtruth-14394-p3",
+      "text": "Wettest year was recorded in 1876 at Indianapolis : 57.65 inches of measured rain. 1  Driest year was recorded in 1934 at Indianapolis : 24.97 inches of measured rain. 2  Most snow fall recorded in 1979 in Rockford : 74.5 inches in one season. 3  Maximum monthly precipitation: over 16 inches in July 2003 and 2004 at Kokomo ."
+    }
+  ]
+}

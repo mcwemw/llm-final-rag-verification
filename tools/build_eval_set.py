@@ -1,11 +1,13 @@
-"""Build the evaluation set eval_40pos_v1 from RAGTruth QA (test split).
+"""Build the evaluation set eval_40pos_v1.1 from RAGTruth QA (test split).
 
 Usage (from repo root):
-    python3 tools/build_eval_set.py              # -> data/frozen/eval_40pos_v1/
+    python3 tools/build_eval_set.py              # -> data/frozen/eval_40pos_v1.1/
 
-Same segmenter, gold mapping and sampling procedure as calib_v1 (tools/build_calib_subset.py),
-reused by import so the two sets cannot drift apart. Differences:
-  * split = test (calib_v1 is split = train), new seed, >= 40 hallucinated claims;
+Same segmenter and sampling procedure as calib_v1 (tools/build_calib_subset.py) and the same gold
+rules as calib_v1.1 (tools/gold_rules.py v1.1), reused by import so the sets cannot drift apart.
+Differences:
+  * split = test (calib is split = train), new seed; sampling target >= 50 hallucinated claims,
+    acceptance floor >= 40 valid positives (asserted);
   * leakage guard: a test source is dropped if its question or ANY of its passages (documents)
     also occurs in a train source. calib_v1 is a subset of train, so this is stricter than
     "no overlap with calib_v1". The overlap with calib_v1 itself is then asserted to be empty
@@ -26,14 +28,16 @@ from collections import Counter, defaultdict
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from build_calib_subset import claims_for, dedupe_labels, round_robin, sha256  # noqa: E402
+from build_calib_subset import dedupe_labels, round_robin, sha256  # noqa: E402
+from gold_rules import GOLD_RULES_VERSION, claims_for  # noqa: E402
 from generate_examples import check_invariants, load_jsonl, split_passages, to_bundle, validate_schema  # noqa: E402
 from segment import MIN_WORDS, RULES_VERSION  # noqa: E402
 
 ROOT = Path(__file__).resolve().parent.parent
-NAME = "eval_40pos_v1"
+NAME = "eval_40pos_v1.1"
+MIN_VALID_POSITIVES = 40
 SEED = 20261127  # different from calib_v1 (20261021)
-CALIB = ROOT / "data" / "frozen" / "calib_v1"
+CALIB = ROOT / "data" / "frozen" / "calib_v1.1"  # same responses as calib_v1
 
 
 def norm(t):
@@ -53,7 +57,7 @@ def main():
     ap.add_argument("--data-dir", default=str(ROOT / "data"))
     ap.add_argument("--out", default=str(ROOT / "data" / "frozen" / NAME))
     ap.add_argument("--seed", type=int, default=SEED)
-    ap.add_argument("--min-halluc-claims", type=int, default=40)
+    ap.add_argument("--min-halluc-claims", type=int, default=50, help="sampling target")
     ap.add_argument("--target-claims", type=int, default=150)
     ap.add_argument("--faithful-share", type=float, default=0.33,
                     help="fraction of RESPONSES that are fully faithful (same as calib_v1)")
@@ -181,6 +185,7 @@ def main():
     nat = sum(c["y_true"] for c in pool_claims) / len(pool_claims)
     w1, w0 = nat / rate, (1 - nat) / (1 - rate)
     lost = [c for c in exc if c["y_true"]]
+    assert len(pos) >= MIN_VALID_POSITIVES, f"only {len(pos)} valid positives (< {MIN_VALID_POSITIVES}): not freezable"
     low_overlap = [c for c in pos if c["overlap_ratio"] < 0.3]
     n_hal_resp = sum(1 for r in picked if r["labels"])
     pool_hal_resp = sum(1 for r in pool if r["labels"])
@@ -193,9 +198,11 @@ def main():
 
     stats = f"""# Evaluation set {NAME} — stats (CANDIDATE, not frozen)
 
-RAGTruth QA, **split=test**, quality=good, SEED={args.seed}, segmenter rules v{RULES_VERSION} (MIN_WORDS={MIN_WORDS}).
+RAGTruth QA, **split=test**, quality=good, SEED={args.seed}, segmenter rules v{RULES_VERSION} (MIN_WORDS={MIN_WORDS}),
+**gold rules v{GOLD_RULES_VERSION}** (punctuation-only overlap is not a positive).
 Sampling is the calib_v1 procedure, imported from `tools/build_calib_subset.py` (one response per source_id,
-round-robin over generator models, oversampled: >= {args.min_halluc_claims} hallucinated claims,
+round-robin over generator models, oversampled: sampling target >= {args.min_halluc_claims} hallucinated claims
+(acceptance floor {MIN_VALID_POSITIVES}),
 ~{args.faithful_share:.0%} of responses fully faithful, stop at response boundaries).
 
 | | count |
@@ -217,8 +224,8 @@ Hallucinated claims per generator model: {', '.join(f'{m} {n}' for m, n in sorte
 
 ## Positive definition
 
-Gold comes only from RAGTruth's human span annotations, never from an LLM (same mapping as calib_v1):
-a claim is hallucinated (y_true=1) if its character span overlaps any annotated span;
+Gold comes only from RAGTruth's human span annotations, never from an LLM (gold rules v{GOLD_RULES_VERSION}, as calib_v1.1):
+a claim is hallucinated (y_true=1) if its span overlaps an annotated span on at least one letter or digit;
 any Conflict span -> FAIL, Baseless-only -> UNSOURCED, no overlap -> PASS.
 Every positive is listed with the overlapping human span and the annotator note in `POSITIVES_REVIEW.md`.
 
@@ -227,10 +234,10 @@ Every positive is listed with the overlapping human span and the annotator note 
 | check | result |
 |---|---|
 | split of every response | {', '.join(leak['split_of_every_response'])} (calib_v1 is train) |
-| response_id overlap with calib_v1 | {leak['response_id_overlap_with_calib_v1']} |
-| source_id overlap with calib_v1 | {leak['source_id_overlap_with_calib_v1']} |
-| question overlap with calib_v1 | {leak['question_overlap_with_calib_v1']} |
-| document (passage) overlap with calib_v1 | {leak['document_overlap_with_calib_v1']} |
+| response_id overlap with calib_v1 / v1.1 | {leak['response_id_overlap_with_calib_v1']} |
+| source_id overlap with calib_v1 / v1.1 | {leak['source_id_overlap_with_calib_v1']} |
+| question overlap with calib_v1 / v1.1 | {leak['question_overlap_with_calib_v1']} |
+| document (passage) overlap with calib_v1 / v1.1 | {leak['document_overlap_with_calib_v1']} |
 | document (passage) overlap with the whole train split | {leak['document_overlap_with_train']} |
 | one response per source_id | {leak['one_response_per_source_id']} |
 
@@ -265,7 +272,8 @@ AUROC and recall do not depend on prevalence; precision, F1 and max-F1 threshold
              "Rows with overlap < 0.3 are marked ⚠ (claim only touches the span edge).\n"]
     for i, c in enumerate(pos, 1):
         r = by_id[c["response_id"]]
-        spans = [l for l in dedupe_labels(r["labels"]) if l["start"] < c["char_end"] and l["end"] > c["char_start"]]
+        spans = [l for l in dedupe_labels(r["labels"])
+                 if any(r["response"][i].isalnum() for i in range(max(l["start"], c["char_start"]), min(l["end"], c["char_end"])))]
         warn = " ⚠" if c["overlap_ratio"] < 0.3 else ""
         lines.append(f"\n## {i}. `{c['claim_id']}` — {c['gold_verdict']}, overlap {c['overlap_ratio']}{warn}\n")
         lines.append(f"- model: {c['model']}\n- claim: {c['claim_text']}\n")
@@ -285,7 +293,8 @@ AUROC and recall do not depend on prevalence; precision, F1 and max-F1 threshold
                     "exclude_sources_sharing_question_or_passage_with_train": True,
                     "one_response_per_source_id": True, "model_round_robin": True},
         "dropped_test_sources": dropped,
-        "segmenter_rules_version": RULES_VERSION,
+        "segmenter_rules_version": RULES_VERSION, "gold_rules_version": GOLD_RULES_VERSION,
+        "min_valid_positives": MIN_VALID_POSITIVES,
         "counts": {"responses": len(picked), "claims_scored": len(inc), "hallucinated_claims": len(pos),
                    "PASS": v["PASS"], "FAIL": v["FAIL"], "UNSOURCED": v["UNSOURCED"]},
         "prevalence": {"in_sample": round(rate, 4), "natural_test_pool": round(nat, 4),
@@ -294,8 +303,8 @@ AUROC and recall do not depend on prevalence; precision, F1 and max-F1 threshold
         "leakage": leak,
         "inputs": {"response.jsonl": sha256(data / "response.jsonl"),
                    "source_info.jsonl": sha256(data / "source_info.jsonl"),
-                   "calib_v1/responses.jsonl": sha256(CALIB / "responses.jsonl")},
-        "code": {p: sha256(ROOT / p) for p in ("tools/build_eval_set.py", "tools/build_calib_subset.py",
+                   "calib_v1.1/responses.jsonl": sha256(CALIB / "responses.jsonl")},
+        "code": {p: sha256(ROOT / p) for p in ("tools/build_eval_set.py", "tools/gold_rules.py", "tools/build_calib_subset.py",
                                                "tools/segment.py", "tools/generate_examples.py")},
         "outputs": {str(p.relative_to(out)): sha256(p) for p in files},
     }
