@@ -39,6 +39,34 @@ def test_scorer_result_score_bounds():
         assert 0.0 <= r.score <= 1.0
 
 
+# ── NLIScorer label mapping ───────────────────────────────────────────────────
+
+def test_nli_label_index_by_name():
+    # cross-encoder/nli-deberta-v3-small: {0: contradiction, 1: entailment, 2: neutral};
+    # the old code read index 2 (= neutral) as entailment.
+    import pytest
+    from blocks.scorer import _label_index
+    assert _label_index({0: "contradiction", 1: "entailment", 2: "neutral"}, "entailment") == 1
+    assert _label_index({"0": "CONTRADICTION", "1": "NEUTRAL", "2": "ENTAILMENT"}, "entailment") == 2
+    with pytest.raises(ValueError):
+        _label_index({0: "LABEL_0", 1: "LABEL_1", 2: "LABEL_2"}, "entailment")
+
+
+def test_nli_scorer_entailment_is_high_for_entailed_claim():
+    import pytest
+    pytest.importorskip("sentence_transformers")
+    from blocks.aligner import AlignedClaim
+    from blocks.scorer import NLIScorer
+    s = NLIScorer()
+    def claim(text):
+        return AlignedClaim(claim_text=text, char_start=0, char_end=len(text), cited_doc_id="d1",
+                            cited_span_text="The cat sat on the mat.", alignment="explicit")
+    docs = [{"doc_id": "d1", "text": "The cat sat on the mat."}]
+    entailed = s.score(claim("A cat is on the mat."), docs).score
+    unrelated = s.score(claim("The cat is black."), docs).score   # neutral, not entailed
+    assert entailed > 0.9 and unrelated < 0.1
+
+
 # ── SelfAttentionScorer — full tests (no external deps) ───────────────────────
 
 class TestSelfAttentionScorer:
