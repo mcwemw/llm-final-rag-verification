@@ -168,3 +168,31 @@ class TestEmbeddingScorer:
                        "Roth IRA allows tax-free withdrawals")
         result = scorer.score(claim, _docs("Roth IRA allows tax-free withdrawals"))
         assert result.deterministic is True
+
+
+def test_selfattn_deterministic_across_processes():
+    """HW1 scorer must give identical scores in separate processes with different
+    PYTHONHASHSEED values (regression: it used the salted built-in hash())."""
+    import os
+    import subprocess
+    import sys
+    from pathlib import Path
+
+    code = (
+        "from blocks.aligner import AlignedClaim\n"
+        "from blocks.scorer import SelfAttentionScorer\n"
+        "s = SelfAttentionScorer()\n"
+        "pairs = [('Roth IRA contributions are not tax-deductible', 'You cannot deduct contributions to a Roth IRA.'),\n"
+        "         ('quantum computing uses qubit superposition states', 'pine nuts harvested from BC forests')]\n"
+        "for c, d in pairs:\n"
+        "    a = AlignedClaim(c, 0, len(c), 'p1', d, 'nearest')\n"
+        "    print(repr(s.score(a, [{'doc_id': 'p1', 'text': d}]).score))\n"
+    )
+    repo = str(Path(__file__).resolve().parent.parent)
+    outs = set()
+    for seed in ("0", "1", "12345"):
+        env = {**os.environ, "PYTHONHASHSEED": seed}
+        r = subprocess.run([sys.executable, "-c", code], cwd=repo, env=env,
+                           capture_output=True, text=True, check=True)
+        outs.add(r.stdout)
+    assert len(outs) == 1, f"scores differ across processes: {outs}"
