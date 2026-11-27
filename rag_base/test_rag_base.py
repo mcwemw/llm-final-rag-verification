@@ -118,3 +118,78 @@ def test_partial_run_exits_nonzero_and_client_retries(monkeypatch):
     monkeypatch.setenv("GROQ_API_KEY", "test-key")
     p2.make_client()
     assert seen["max_retries"] == p2.GROQ_MAX_RETRIES >= 5
+
+
+# ── Partial completion must never be reported as success (live demo 2026-11-27) ──
+_OK = {"id": "x", "object": "chat.completion", "created": 0, "model": "openai/gpt-oss-120b",
+       "choices": [{"index": 0, "finish_reason": "stop",
+                    "message": {"role": "assistant", "content": "可以參考【doc_001】。"}}],
+       "usage": {"prompt_tokens": 1, "completion_tokens": 1, "total_tokens": 2}}
+
+
+def _run_main(monkeypatch, tmp_path, argv, statuses):
+    """Run program2_answer.main() end to end with a fake KB / course and a REAL groq client
+    whose HTTP transport answers with `statuses` (then 429 forever). Returns (exit code, #requests)."""
+    import sys
+    import types
+    import httpx
+    from groq import Groq
+    from rag_base import program2_answer as p2
+
+    doc = {"doc_id": "doc_001", "text": "工讀生依法享有勞動權益。", "metadata": {"filename": "a.md", "title": "t"}}
+
+    class FakeKB:
+        def __init__(self, path, device=None):
+            self.index = types.SimpleNamespace(ntotal=1)
+            self.config = {"model_id": "fake", "model_revision": "0000000"}
+            self.device = "cpu"
+            self.documents = [doc]
+            self.documents_by_id = {"doc_001": doc}
+
+        def search(self, q, k):
+            return [{"rank": 1, "doc_id": "doc_001", "score": 0.9, "metadata": doc["metadata"], "text": doc["text"]}]
+
+    course = types.SimpleNamespace(commit="c", build_messages=lambda q, r: [{"role": "user", "content": q}],
+                                   safe_api_error=lambda e: f"API error: {type(e).__name__}",
+                                   citation_note=lambda a, r: "note")
+    calls = {"n": 0}
+
+    def handler(request):
+        i = calls["n"]
+        calls["n"] += 1
+        if i < len(statuses) and statuses[i] == 200:
+            return httpx.Response(200, json=_OK)
+        return httpx.Response(429, json={"error": {"message": "rate limit"}}, headers={"retry-after-ms": "1"})
+
+    client = Groq(api_key="test", max_retries=p2.GROQ_MAX_RETRIES,
+                  http_client=httpx.Client(transport=httpx.MockTransport(handler)))
+    monkeypatch.setattr(p2, "KnowledgeBase", FakeKB)
+    monkeypatch.setattr(p2.course_assets, "load", lambda d: course)
+    monkeypatch.setattr(p2, "make_client", lambda: client)
+    monkeypatch.setattr(p2, "load_question_set", lambda z: [
+        {"question": "第一題", "expected_file": None, "type": None},
+        {"question": "第二題", "expected_file": None, "type": None}])
+    monkeypatch.setattr(sys, "argv", ["program2_answer", "--course-dir", str(tmp_path), "--kb", "fake",
+                                      "--out", str(tmp_path / "out")] + argv)
+    with pytest.raises(SystemExit) as e:
+        p2.main()
+    return e.value.code, calls["n"]
+
+
+def test_429_retries_exhausted_reports_failure(monkeypatch, tmp_path):
+    code, n = _run_main(monkeypatch, tmp_path, ["-q", "工讀生有特休嗎？", "--name", "t1"], statuses=[])
+    from rag_base.program2_answer import GROQ_MAX_RETRIES
+    assert n == 1 + GROQ_MAX_RETRIES          # every retry was really attempted
+    assert code == 1                           # ...and the run is reported as failed
+    assert not (tmp_path / "out" / "t1.json").exists()
+
+
+def test_partial_question_set_is_not_success(monkeypatch, tmp_path):
+    code, n = _run_main(monkeypatch, tmp_path, ["--question-set"], statuses=[200])
+    assert code == 1                                         # 1 of 2 answered -> failure
+    assert (tmp_path / "out" / "q01.json").exists() and not (tmp_path / "out" / "q02.json").exists()
+
+
+def test_full_question_set_is_success(monkeypatch, tmp_path):
+    code, _ = _run_main(monkeypatch, tmp_path, ["--question-set"], statuses=[200, 200])
+    assert code == 0
