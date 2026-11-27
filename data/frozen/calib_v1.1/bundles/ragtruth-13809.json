@@ -1,0 +1,39 @@
+{
+  "schema_version": "1.1",
+  "question": "what is the difference between sauce and gravy ?",
+  "answer": "Based on the provided passages, the main difference between sauce and gravy is that gravy is a specific type of sauce that is typically made from the juices of cooked meat, while sauce can be made from a variety of ingredients and is not limited to meat juices.\n\nPassage 1 defines gravy as the meat juice left in the pan after roasting a joint, which can be thickened or served as is and is always served hot. This passage also notes that a sauce is made from several ingredients to complement the food it is accompanying and can be thickened or unthickened, and can be served hot or cold depending on the recipe.\n\nPassage 2 provides additional insight into the distinction between sauce and gravy by highlighting that while gravy is made from animal flesh, sauce is not limited to any particular ingredient and can be made from plant-based or non-animal sources.\n\nPassage 3 summarizes the key differences between sauce and gravy, stating that gravy is a type of sauce and that the main difference between the two is that gravy is not usually used in food preparation, whereas sauce is used in both food preparation and service.\n\nTherefore, based on the provided passages, the answer to the question is:\n\nDifference between sauce and gravy:\nGravy is a type of sauce that is made from meat juices, while sauce can be made from a variety of ingredients and is not limited to meat juices.",
+  "citations": [
+    {
+      "doc_id": "ragtruth-15221-p1",
+      "span_start": 10,
+      "span_end": 313,
+      "text": "A gravy is normally the meat juice left in the pan after roasting a joint, it can be thickened or served as it is and will always be served hot, a sauce is made from several ingredients to compliment the food it is to accompany and always thickened, it can be served hot or cold depending on the recipe."
+    },
+    {
+      "doc_id": "ragtruth-15221-p2",
+      "span_start": 325,
+      "span_end": 608,
+      "text": "In other words, to be used for the same thing as meat gravy is used, but not made from animal flesh. Note also that while a raspberry sauce can be expected to be made of raspberries, that cranberry sauce is a relish made from cranberries, not something to be spread atop cranberries."
+    },
+    {
+      "doc_id": "ragtruth-15221-p3",
+      "span_start": 620,
+      "span_end": 893,
+      "text": "These are the differences between sauce and gravy. As you can see, gravy is a type of sauce. The special difference we can see between sauce and gravy is that gravy is not usually used in preparing food. However, the sauce is used in preparing food as well as serving food."
+    }
+  ],
+  "retrieved": [
+    {
+      "doc_id": "ragtruth-15221-p1",
+      "text": "A gravy is normally the meat juice left in the pan after roasting a joint, it can be thickened or served as it is and will always be served hot, a sauce is made from several ingredients to compliment the food it is to accompany and always thickened, it can be served hot or cold depending on the recipe."
+    },
+    {
+      "doc_id": "ragtruth-15221-p2",
+      "text": "In other words, to be used for the same thing as meat gravy is used, but not made from animal flesh. Note also that while a raspberry sauce can be expected to be made of raspberries, that cranberry sauce is a relish made from cranberries, not something to be spread atop cranberries."
+    },
+    {
+      "doc_id": "ragtruth-15221-p3",
+      "text": "These are the differences between sauce and gravy. As you can see, gravy is a type of sauce. The special difference we can see between sauce and gravy is that gravy is not usually used in preparing food. However, the sauce is used in preparing food as well as serving food."
+    }
+  ]
+}
