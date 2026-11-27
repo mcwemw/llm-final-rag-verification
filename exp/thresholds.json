@@ -1,0 +1,25 @@
+{
+  "_comment": "Thresholds calibrated ON the frozen calibration subset. Bound to it explicitly so a threshold can never be silently reused against different data.",
+  "calib_version": "calib_v1",
+  "calib_path": "data/frozen/calib_v1",
+  "calib_manifest_sha256": "3326b9a6be61f9ce4254afc6c5ac654b93d9d0f7bb01997ba64e9518af489888",
+  "dataset_version": "ragtruth@c103204",
+  "single_threshold_maxF1": {
+    "f1": 0.8519,
+    "t": 0.56,
+    "precision": 0.7667,
+    "recall": 0.9583
+  },
+  "warn_band": {
+    "lo": 0.1639,
+    "hi": 0.6129,
+    "eps": 0.1,
+    "n_in_warn": 27,
+    "warn_hallu_rate": 0.7037
+  },
+  "n": 32,
+  "n_hallucinated": 24,
+  "n_faithful": 8,
+  "scorer": "lexical",
+  "subset": "calib_subset_resp.jsonl"
+}

@@ -3,6 +3,13 @@
 # ...except reproducibility tools and block implementations (deliverables).
 !tools/*.py
 !blocks/*.py
+# ...and the benchmark harness + scorers (Emma's deliverable).
+!exp/*.py
+!exp/scorers/*.py
+# ...but never harness results / fetched data (keep public repo clean).
+exp/results/
+exp/data/
+**/__pycache__/
 faithfulness-gate/
 research-connection.md
 STATUS.md
