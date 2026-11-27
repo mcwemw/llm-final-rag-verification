@@ -1,0 +1,39 @@
+{
+  "schema_version": "1.1",
+  "question": "age vs income data",
+  "answer": "Based on the given passages, it is evident that income tends to increase with age. This is indicated by the higher median weekly earnings for both men and women in older age groups, as mentioned in passage 1. However, the specific relationship between age and income is not provided.",
+  "citations": [
+    {
+      "doc_id": "ragtruth-14332-p1",
+      "span_start": 10,
+      "span_end": 531,
+      "text": "According to the U.S. Bureau of Labor Statistics, reporting on the usual weekly earnings of wage and salary workers for the second quarter of 2012, the median weekly earnings for men and women were higher in older age groups. Men ages 45 to 54 had median weekly earnings of $1,003; for men 55 to 64, the median weekly earnings were $1,015. For women, the usual weekly earnings were highest for those 55 to 64 at $760. Women ages 35 to 44 had median weekly earnings of $749, while women from 45 to 54 earned a median $733."
+    },
+    {
+      "doc_id": "ragtruth-14332-p2",
+      "span_start": 543,
+      "span_end": 838,
+      "text": "Personal income is an individual's total earnings from wages, investment interest, and other sources. The US Census Bureau reported a median personal income of $30,240 for all workers over age 15 with income, and a mean personal income of $44,510 based on the Current Population Survey for 2015."
+    },
+    {
+      "doc_id": "ragtruth-14332-p3",
+      "span_start": 850,
+      "span_end": 1104,
+      "text": "Among different demographics (gender, marital status, ethnicity) for those over the age of 18, median personal income ranged from $3,317 for an unemployed, married Asian American female to $55,935 for a full-time, year-round employed Asian American male."
+    }
+  ],
+  "retrieved": [
+    {
+      "doc_id": "ragtruth-14332-p1",
+      "text": "According to the U.S. Bureau of Labor Statistics, reporting on the usual weekly earnings of wage and salary workers for the second quarter of 2012, the median weekly earnings for men and women were higher in older age groups. Men ages 45 to 54 had median weekly earnings of $1,003; for men 55 to 64, the median weekly earnings were $1,015. For women, the usual weekly earnings were highest for those 55 to 64 at $760. Women ages 35 to 44 had median weekly earnings of $749, while women from 45 to 54 earned a median $733."
+    },
+    {
+      "doc_id": "ragtruth-14332-p2",
+      "text": "Personal income is an individual's total earnings from wages, investment interest, and other sources. The US Census Bureau reported a median personal income of $30,240 for all workers over age 15 with income, and a mean personal income of $44,510 based on the Current Population Survey for 2015."
+    },
+    {
+      "doc_id": "ragtruth-14332-p3",
+      "text": "Among different demographics (gender, marital status, ethnicity) for those over the age of 18, median personal income ranged from $3,317 for an unemployed, married Asian American female to $55,935 for a full-time, year-round employed Asian American male."
+    }
+  ]
+}

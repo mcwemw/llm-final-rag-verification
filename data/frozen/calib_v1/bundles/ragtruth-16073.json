@@ -1,0 +1,39 @@
+{
+  "schema_version": "1.1",
+  "question": "how to get the update for lego star wars the complete saga",
+  "answer": "Unfortunately, the provided passages do not contain information on how to get updates for Lego Star Wars: The Complete Saga. Therefore, I cannot provide an answer to the question based on the given passages.\n\nHowever, I can suggest some general steps that may help you find updates for the game:\n\n1. Check the App Store or Google Play Store for updates: You can check the App Store or Google Play Store on your mobile device to see if there are any updates available for Lego Star Wars: The Complete Saga.\n2. Follow the game's social media accounts: You can follow the official social media accounts of Lego Star Wars: The Complete Saga on platforms like Twitter, Facebook, or Instagram to stay up-to-date with the latest news and updates about the game.\n3. Visit the game's website: You can visit the official website of Lego Star Wars: The Complete Saga to check for any updates or patch notes.\n4. Join a community forum: You can join a community forum or discussion board dedicated to Lego Star Wars: The Complete Saga to ask other players about updates and share tips and strategies.\n\nI hope these suggestions help you find the updates you are looking for.",
+  "citations": [
+    {
+      "doc_id": "ragtruth-12169-p1",
+      "span_start": 10,
+      "span_end": 213,
+      "text": "LEGO® Star Wars™: The Complete Saga is available on iOS for the first time! ***Episode I Story Mode is FREE for a limited time.***. **Episodes II – VI and other content available via in-app purchases.**."
+    },
+    {
+      "doc_id": "ragtruth-12169-p2",
+      "span_start": 225,
+      "span_end": 426,
+      "text": "Lego Star Wars: The Complete Saga for iOS includes one episode, you must pay for the rest. Episode 1: The Phantom Menace is included with free download, but you have to pay for the other five episodes."
+    },
+    {
+      "doc_id": "ragtruth-12169-p3",
+      "span_start": 438,
+      "span_end": 688,
+      "text": "LEGO® Star Wars™ The New Yoda Chronicles. Choose your side and join the battle in LEGO® Star Wars™ The New Yoda Chronicles! Collect the Holocrons to defeat your enemy and take control of the galaxy in a series of fast-paced, action packed mini games."
+    }
+  ],
+  "retrieved": [
+    {
+      "doc_id": "ragtruth-12169-p1",
+      "text": "LEGO® Star Wars™: The Complete Saga is available on iOS for the first time! ***Episode I Story Mode is FREE for a limited time.***. **Episodes II – VI and other content available via in-app purchases.**."
+    },
+    {
+      "doc_id": "ragtruth-12169-p2",
+      "text": "Lego Star Wars: The Complete Saga for iOS includes one episode, you must pay for the rest. Episode 1: The Phantom Menace is included with free download, but you have to pay for the other five episodes."
+    },
+    {
+      "doc_id": "ragtruth-12169-p3",
+      "text": "LEGO® Star Wars™ The New Yoda Chronicles. Choose your side and join the battle in LEGO® Star Wars™ The New Yoda Chronicles! Collect the Holocrons to defeat your enemy and take control of the galaxy in a series of fast-paced, action packed mini games."
+    }
+  ]
+}

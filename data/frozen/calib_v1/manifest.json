@@ -1,0 +1,63 @@
+{
+  "name": "calib_v1",
+  "seed": 20261021,
+  "sampling": "oversampled",
+  "target_claims": 150,
+  "faithful_share": 0.33,
+  "min_halluc_claims": 50,
+  "filters": {
+    "task_type": "QA",
+    "split": "train",
+    "quality": "good",
+    "exclude_example_source_ids": true,
+    "one_response_per_source_id": true,
+    "model_round_robin": true
+  },
+  "segmenter_rules_version": "1.0",
+  "inputs": {
+    "ragtruth_commit": "c103204b9ce28d6bbad859304bf30de72b8ed8fe",
+    "response.jsonl": "e4c2e4ac24fff676d8984cc61c35d791612fadc58015335d97dd632375e18073",
+    "source_info.jsonl": "0dffc26ea9f3c1c3d7c7e8336b56ef1646e3cec876edffcca3c9c624d12d578b"
+  },
+  "code": {
+    "tools/build_calib_subset.py": "469aaae9ba524c4dcb2cb271ea9ad6e283fc8114d3ea50ae720009717c67ab9e",
+    "tools/segment.py": "701aa2dfb4064d2eaa21544deab3ff7ba8a2db89bbb030de2094ea6f9f079894"
+  },
+  "outputs": {
+    "STATS.md": "9494f4d7e4ee766e4b016203df41b0c89a48da08657193c32582c9e6e36476d6",
+    "bundles/ragtruth-12003.json": "69cca6533eeb97d328385c288a6b328f30d7d7ada5bdbff02ae3532326e04b4f",
+    "bundles/ragtruth-12007.json": "161c2656cb3ff2daf4f61c0fe5768829101e64c97a67b96d4018ffeb2fec7e9a",
+    "bundles/ragtruth-12091.json": "119020ea8e03b007eb1150cf8cd0685aa097b32f685038fd64ccb6a63e0033b0",
+    "bundles/ragtruth-12204.json": "77a505981c97e3596d5e487d397696dcadc383cad054451aaedaca5f0cfb11dc",
+    "bundles/ragtruth-12664.json": "b39d594d99dcaffc4a49bc72f640dcf72d2d6d5fa09e024c9703682c35a53201",
+    "bundles/ragtruth-12812.json": "ec01b014873967b2a7479ef7cd0ea7a233e29a4ea9cf0a401c4cd2407c752314",
+    "bundles/ragtruth-12893.json": "3ff97e84de94a1baf7bb4b1c27aad861621d9b45ec3b95c746f80a55b7a4b358",
+    "bundles/ragtruth-12918.json": "6296694dd141d8419fdff4e49b23dffff84fb031bdc73e37094e54c68215d49c",
+    "bundles/ragtruth-12942.json": "fea2a88ac88a7f12150ed0e2dec337afad949a17befffe3960e489bc23a85bf8",
+    "bundles/ragtruth-13051.json": "c40d3e398787a25c9bea0cc8827d07f7662e394dbecfce87fe8739dc7cc658a1",
+    "bundles/ragtruth-13639.json": "0aba2d769c1a532679be549e6ae7ee1e519eae194792b17b96b1e63cfbda246f",
+    "bundles/ragtruth-13798.json": "500fcdbaa857cca4f4a4139b5b2ab877f6779a218553a23bbb3979bb5ae70d28",
+    "bundles/ragtruth-13809.json": "84145ea14cee213b211ea1c847fdd71bd7729051b2ad69556f490898767a63aa",
+    "bundles/ragtruth-13847.json": "64b9f277aeb368ef122cb5090d7a6613aeed026f5ccddf1fa6a67ca53c3c8f9d",
+    "bundles/ragtruth-14739.json": "ed9ce81db03719a281cec1d67d3f843039d56d43f86994a281c08461c93b44e5",
+    "bundles/ragtruth-14770.json": "525be20830d4e67fa42dc48aedd09a0a7058b79ba8804416c70721cededd78ac",
+    "bundles/ragtruth-14840.json": "c56112f6741bd3a12ba7056d14288947b6be7ed368c0c209acc2a341808dae82",
+    "bundles/ragtruth-15037.json": "797e055e0ea38d0421b08af3665ee0b62133aea9592ad5efb22932c1a01e7d30",
+    "bundles/ragtruth-15238.json": "39bebf0a55a0cba7c181e9f6142ce1438e786cde98fab0997192f6a3676188aa",
+    "bundles/ragtruth-15323.json": "c8bb8846e9ead314a224bd9b6e43d7a89911861da2ae3d07f447c76dd05bf622",
+    "bundles/ragtruth-15560.json": "763d986b12d8ce91c6e01fe9941a3eb9249d64645633b927e6f10daada27695c",
+    "bundles/ragtruth-15644.json": "acacf56fff6388e23e6407cab648c1b222f755167ca7d3313e6fba30836c20ab",
+    "bundles/ragtruth-16041.json": "aa5700ecca4b7d54d0ad9bd2a4720399a36941f8412095b46639adf0be4259a0",
+    "bundles/ragtruth-16073.json": "b2d925a5e97421551cdc58195793f66bca35f18cba4488328e0fb39182fab6b9",
+    "bundles/ragtruth-16141.json": "da7a6d08c41b8ec162ba0d71ce07561bf960bf60c2f16c12c0598dcf9ef6753b",
+    "bundles/ragtruth-16422.json": "7a542a05c84ff454bb9a9e3b060fa8311094669bac930cd83e9b5fd656e887ce",
+    "bundles/ragtruth-16578.json": "f37357cd80e4d334e7faf5ef1fa0294bafd58a880296f9702e52b229b2476291",
+    "bundles/ragtruth-16620.json": "9cb057a836fb7b40676b6c94cab562cd9a2fcc68032cae0c2de4975a65779adf",
+    "bundles/ragtruth-16803.json": "ecbb16a6cb4d7cb43515067367561a9530f2395ad1ef78f52e295def212a9f05",
+    "bundles/ragtruth-16888.json": "f4b356e8c880569839ead871439bb5cec73eba8b550a5a35eed98e370545074a",
+    "bundles/ragtruth-17279.json": "ea48b0be2c67ebb90c5ba94bcfd2395e4b58aeb24df6d8bacc2de63a2b0a9286",
+    "bundles/ragtruth-17678.json": "f2197baa2fab155f9954a65ace2763dbd26a24953ba429446bc9e28ce7471c02",
+    "claims.jsonl": "8afffd8e1b5868683bfa11eabb5c7d619fe2a6f0559a6e7003410fb64aec0b62",
+    "responses.jsonl": "47d81efa7a37dcd8680df5a10172e361c5b3c2c248adf41bc989b6ee1ab2af6e"
+  }
+}

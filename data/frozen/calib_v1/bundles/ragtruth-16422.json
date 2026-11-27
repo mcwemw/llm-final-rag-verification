@@ -1,0 +1,39 @@
+{
+  "schema_version": "1.1",
+  "question": "how do i get my music from itunes to my android",
+  "answer": "You can get your music from iTunes to your Android by first exporting the music to your computer using iTunes. After doing this, you can either transfer the music to your Android wirelessly using a free app or connect the phone to your computer via USB and manually select songs for transfer to your Android phone.",
+  "citations": [
+    {
+      "doc_id": "ragtruth-12229-p1",
+      "span_start": 10,
+      "span_end": 232,
+      "text": "The easiest way is to export music to the computer using iTunes. Go to My Music and copy everything to PC. Then use a free app to transfer music to your Android wirelessly. I've used this way to transfer hundreds of songs."
+    },
+    {
+      "doc_id": "ragtruth-12229-p2",
+      "span_start": 244,
+      "span_end": 542,
+      "text": "Once you have identified your iTunes music that's transferable to your Android phone, just connect the phone to your computer via USB. You'll see a message in the phone's notification area saying that you're connected via USB and it'll ask if you want to mount the storage for use by your computer."
+    },
+    {
+      "doc_id": "ragtruth-12229-p3",
+      "span_start": 554,
+      "span_end": 795,
+      "text": "Manually selecting songs for transfer to your Android phone. 1  On the doubleTwist window, click Music under Library. 2  Select a song from the list. 3  You can select one song, select multiple songs, or select all songs from a single album."
+    }
+  ],
+  "retrieved": [
+    {
+      "doc_id": "ragtruth-12229-p1",
+      "text": "The easiest way is to export music to the computer using iTunes. Go to My Music and copy everything to PC. Then use a free app to transfer music to your Android wirelessly. I've used this way to transfer hundreds of songs."
+    },
+    {
+      "doc_id": "ragtruth-12229-p2",
+      "text": "Once you have identified your iTunes music that's transferable to your Android phone, just connect the phone to your computer via USB. You'll see a message in the phone's notification area saying that you're connected via USB and it'll ask if you want to mount the storage for use by your computer."
+    },
+    {
+      "doc_id": "ragtruth-12229-p3",
+      "text": "Manually selecting songs for transfer to your Android phone. 1  On the doubleTwist window, click Music under Library. 2  Select a song from the list. 3  You can select one song, select multiple songs, or select all songs from a single album."
+    }
+  ]
+}
