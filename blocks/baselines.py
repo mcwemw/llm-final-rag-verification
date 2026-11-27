@@ -11,6 +11,7 @@ Baselines here:
 from __future__ import annotations
 
 import asyncio
+import json
 import math
 import os
 import time
@@ -69,6 +70,9 @@ PROVIDERS: dict[str, dict[str, str]] = {
     # GLM-5.3-Flash (open weights, zai-org/GLM-5.3-Flash) chosen in the pilot comparison.
     "fireworks": {"base_url": "https://api.fireworks.ai/inference/v1", "key_env": "FIREWORKS_API_KEY",
                   "model": "accounts/fireworks/models/glm-5p3-flash"},
+    # NVIDIA NIM hosted API (judge pilot 2026-11-27). Free-tier terms / RPM / retention: UNKNOWN.
+    "nim": {"base_url": "https://integrate.api.nvidia.com/v1", "key_env": "NVIDIA_API_KEY",
+            "model": "mistralai/mistral-large-4-1t-a52b"},
 }
 GROQ_BASE_URL = PROVIDERS["groq"]["base_url"]
 DEFAULT_GROQ_MODEL = PROVIDERS["groq"]["model"]
@@ -92,12 +96,13 @@ class _Usage:
     """Token / call / HTTP-request counters. retries = http_requests - calls."""
 
     def __init__(self) -> None:
-        self.total = {"prompt_tokens": 0, "completion_tokens": 0, "calls": 0, "http_requests": 0}
+        self.total = self._zero()
         self.last = self._zero()
 
     @staticmethod
     def _zero() -> dict:
-        return {"prompt_tokens": 0, "completion_tokens": 0, "calls": 0, "http_requests": 0}
+        return {"prompt_tokens": 0, "completion_tokens": 0, "reasoning_tokens": 0, "calls": 0,
+                "http_requests": 0}
 
     def reset_last(self) -> None:
         self.last = self._zero()
@@ -112,6 +117,8 @@ class _Usage:
         if usage is not None:
             self.add("prompt_tokens", getattr(usage, "prompt_tokens", 0) or 0)
             self.add("completion_tokens", getattr(usage, "completion_tokens", 0) or 0)
+            details = getattr(usage, "completion_tokens_details", None)
+            self.add("reasoning_tokens", getattr(details, "reasoning_tokens", 0) or 0)
 
     def cost(self, d: dict, price_in: float | None, price_out: float | None) -> float:
         if price_in is None or price_out is None:
@@ -128,6 +135,27 @@ def _warn_prices(cls: str, price_in, price_out) -> None:
         warnings.warn(f"{cls}: prices not set -> cost_usd reported as 0.0. Token counts are still "
                       "recorded; pass price_in_per_mtok / price_out_per_mtok (USD per 1M tokens).",
                       stacklevel=3)
+
+
+def _call_record(resp: Any, request_kwargs: dict, latency_ms: float) -> dict:
+    usage = getattr(resp, "usage", None)
+    details = getattr(usage, "completion_tokens_details", None) if usage is not None else None
+    choice = (getattr(resp, "choices", None) or [None])[0]
+    msg = getattr(choice, "message", None)
+    content = getattr(msg, "content", None)
+    try:
+        json.loads(content or "")
+        json_valid = True
+    except ValueError:
+        json_valid = False
+    rf = request_kwargs.get("response_format")
+    return {"model_returned": getattr(resp, "model", None),
+            "response_format": rf.get("type") if isinstance(rf, dict) else rf,
+            "finish_reason": getattr(choice, "finish_reason", None),
+            "prompt_tokens": getattr(usage, "prompt_tokens", None),
+            "completion_tokens": getattr(usage, "completion_tokens", None),
+            "reasoning_tokens": getattr(details, "reasoning_tokens", None),
+            "latency_ms": round(latency_ms, 1), "json_valid": json_valid, "content": content}
 
 
 # ── RagasScorer ───────────────────────────────────────────────────────────────
@@ -192,6 +220,8 @@ class RagasScorer:
         self.n_nan = 0
         self.last_status = "ok"
         self._usage = _Usage()
+        self._calls: list[dict] = []  # per LLM call of the current claim (judge audit log)
+        self._http: list[dict] = []   # per HTTP attempt of the current claim
         self._loop = asyncio.new_event_loop()  # one persistent loop: AsyncOpenAI must not hop loops
         _warn_prices("RagasScorer", price_in_per_mtok, price_out_per_mtok)
 
@@ -209,10 +239,17 @@ class RagasScorer:
                 async def on_request(_request: Any) -> None:
                     self._usage.add("http_requests", 1)
 
+                async def on_response(response: Any) -> None:
+                    # every HTTP attempt, including the ones the SDK retries (429 / 5xx)
+                    self._http.append({"status": response.status_code,
+                                       "ratelimit": {k: v for k, v in response.headers.items()
+                                                     if "ratelimit" in k.lower() or k.lower() == "retry-after"}})
+
                 client = AsyncOpenAI(api_key=_api_key(provider, api_key), base_url=self.base_url,
                                      max_retries=max_retries,
-                                     http_client=httpx.AsyncClient(event_hooks={"request": [on_request]},
-                                                                   timeout=120))
+                                     http_client=httpx.AsyncClient(
+                                         event_hooks={"request": [on_request], "response": [on_response]},
+                                         timeout=120))
             self._wrap_usage(client)
             kwargs = {}
             if temperature is not None:
@@ -233,11 +270,24 @@ class RagasScorer:
         orig = completions.create
 
         async def create(*args: Any, **kwargs: Any) -> Any:
+            t0 = time.perf_counter()
             resp = await orig(*args, **kwargs)
             self._usage.add_response(resp)
+            self._calls.append(_call_record(resp, kwargs, (time.perf_counter() - t0) * 1000))
             return resp
 
         completions.create = create
+
+    @property
+    def last_calls(self) -> list[dict]:
+        """Audit log of the last claim's LLM calls: returned model id, request response_format,
+        finish_reason, tokens (incl. reasoning), latency and the raw judge output (statements,
+        verdicts and reasons), so verdict reasons can be checked against the source."""
+        return self._calls
+
+    @property
+    def last_http(self) -> list[dict]:
+        return self._http
 
     @property
     def last_usage(self) -> dict:
@@ -272,6 +322,7 @@ class RagasScorer:
         t0 = time.perf_counter()
         cid = _claim_id(claim)
         self._usage.reset_last()
+        self._calls, self._http = [], []
 
         if self.context == "all_docs":
             contexts = [d.get("text", "") for d in cited_docs or [] if d.get("text")]

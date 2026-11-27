@@ -24,6 +24,12 @@ reruns and resumes, retries and failed calls included). The run stops cleanly wh
 
 Gold: a claim is hallucinated (y_true=1) if [char_start, char_end) overlaps any human-labelled
 RAGTruth span (labels deduplicated by (start, end)) — the same rule as calib_v1 `y_true`.
+
+--claims <frozen set>/claims.jsonl (judge pilot, formal runs): use the frozen set's own claims and
+gold (e.g. calib_v1.1, gold rules v1.1) instead of re-segmenting. Each claim is aligned to the
+bundle's citations with blocks/aligner.align. The claims file is checked against the set's
+manifest.json, and the set name, manifest sha256 and gold rules version go into the run manifest,
+so results under different gold rules can never be mixed.
 """
 from __future__ import annotations
 
@@ -44,7 +50,8 @@ from pathlib import Path
 REPO = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(REPO))
 
-from blocks.aligner import align_bundle  # noqa: E402
+from blocks.aligner import align, align_bundle  # noqa: E402
+from blocks.segmenter import Claim  # noqa: E402
 
 SCORERS = ("presence", "ragas", "selfcheck")
 
@@ -53,6 +60,14 @@ PRICES = {
     ("groq", "openai/gpt-oss-20b"): (0.075, 0.30, "third-party listings, 2026-11 (unverified)"),
     ("fireworks", "accounts/fireworks/models/glm-5p3-flash"):
         (0.15, 0.50, "app.fireworks.ai/models, uncached, read 2026-11-27"),
+    ("fireworks", "accounts/fireworks/models/muse-spark-open"):
+        (1.25, 4.25, "app.fireworks.ai/models, uncached, read 2026-11-27"),
+    ("fireworks", "accounts/fireworks/models/inkling-2-small"):
+        (0.30, 1.00, "app.fireworks.ai/models, uncached, read 2026-11-27"),
+    ("nim", "mistralai/mistral-large-4-1t-a52b"):
+        (0.0, 0.0, "NVIDIA NIM hosted API, no charge observed; free-tier terms UNKNOWN (2026-11-27)"),
+    ("nim", "nvidia/nemotron-3-ultra-550b-a55b"):
+        (0.0, 0.0, "NVIDIA NIM hosted API, no charge observed; free-tier terms UNKNOWN (2026-11-27)"),
 }
 # Pre-run cost estimate inputs, measured in the 2026-11-27 model comparison (6 claims / 1 response):
 #   RAGAS per claim, SelfCheckGPT sampling per response (3 samples).
@@ -94,6 +109,20 @@ def load_gold(path: Path) -> dict[str, list[tuple[int, int]]]:
         for stem, g in json.loads(path.read_text(encoding="utf-8")).items():
             gold[stem] = sorted({(l["start"], l["end"]) for l in g["labels"]})
     return gold
+
+
+def load_frozen_claims(path: Path) -> tuple[list[dict], dict]:
+    """Non-excluded claims of a frozen set + its identity, checked against the set's manifest."""
+    man_path = path.parent / "manifest.json"
+    man = json.loads(man_path.read_text(encoding="utf-8"))
+    got = hashlib.sha256(path.read_bytes()).hexdigest()
+    if man["outputs"].get(path.name) != got:
+        sys.exit(f"{path} does not match {man_path} (sha256 {got[:12]}): not the frozen set")
+    claims = [json.loads(l) for l in path.read_text(encoding="utf-8").splitlines() if l.strip()]
+    ident = {"name": man["name"], "manifest_sha256": hashlib.sha256(man_path.read_bytes()).hexdigest(),
+             "claims_sha256": got, "gold_rules_version": man.get("gold_rules_version", "1.0"),
+             "segmenter_rules_version": man.get("segmenter_rules_version")}
+    return [c for c in claims if not c["excluded"]], ident
 
 
 def git_info() -> dict:
@@ -158,7 +187,9 @@ def scorer_stub_config(name: str, args) -> dict:
 def main() -> None:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--bundles", required=True, help="folder of AnswerBundle *.json files")
-    ap.add_argument("--gold", required=True, help="responses.jsonl (RAGTruth) or *_gold.json")
+    ap.add_argument("--gold", default=None, help="responses.jsonl (RAGTruth) or *_gold.json")
+    ap.add_argument("--claims", default=None,
+                    help="claims.jsonl of a frozen set (uses its claims + gold; replaces --gold)")
     ap.add_argument("--dataset-version", required=True, help="e.g. calib_v1 | ragtruth-qa-test-strat100")
     ap.add_argument("--out", required=True, help="output folder (one folder = one experimental condition)")
     ap.add_argument("--scorers", default=",".join(SCORERS))
@@ -166,7 +197,7 @@ def main() -> None:
     ap.add_argument("--limit-bundles", type=int, default=None, help="first N bundles (sorted by id)")
     ap.add_argument("--bundle-ids", default=None, help="file with one bundle id per line (overrides order)")
     ap.add_argument("--threshold", type=float, default=0.5)
-    ap.add_argument("--provider", default="fireworks", choices=["fireworks", "groq"])
+    ap.add_argument("--provider", default="fireworks", choices=["fireworks", "groq", "nim"])
     ap.add_argument("--model", default=None, help="default: the provider's default model")
     ap.add_argument("--seed", type=int, default=None,
                     help="off by default: a fixed sampling seed would suppress the run-to-run "
@@ -190,7 +221,17 @@ def main() -> None:
         sys.exit(f"No known price for {args.provider}/{args.model}: pass --price-in and --price-out.")
 
     load_env()
-    gold = load_gold(Path(args.gold))
+    if bool(args.gold) == bool(args.claims):
+        sys.exit("pass exactly one of --gold or --claims")
+    frozen = None
+    if args.claims:
+        fclaims, frozen = load_frozen_claims(Path(args.claims))
+        by_stem: dict[str, list[dict]] = {}
+        for c in fclaims:
+            by_stem.setdefault(f"ragtruth-{c['response_id']}", []).append(c)
+        gold = by_stem
+    else:
+        gold = load_gold(Path(args.gold))
     paths = {p.stem: p for p in Path(args.bundles).glob("*.json") if p.stem in gold}
     if args.bundle_ids:
         ids = [l.strip() for l in Path(args.bundle_ids).read_text().splitlines() if l.strip()]
@@ -201,14 +242,25 @@ def main() -> None:
         ids = sorted(paths)
     ids = ids[: args.limit_bundles]
     sha = hashlib.sha256()
-    items = []  # (stem, bundle, claim, y_true)
+    items = []  # (stem, bundle, aligned claim, y_true, claim_id)
     for stem in ids:
         raw = paths[stem].read_bytes()
         sha.update(stem.encode() + b"\0" + raw)
         bundle = json.loads(raw)
-        for c in align_bundle(bundle):
-            y = int(any(c.char_start < e and s < c.char_end for s, e in gold[stem]))
-            items.append((stem, bundle, c, y))
+        if frozen:
+            for fc in gold[stem]:
+                assert bundle["answer"][fc["char_start"]:fc["char_end"]] == fc["claim_text"], fc["claim_id"]
+                c = align(Claim(claim_text=fc["claim_text"], char_start=fc["char_start"],
+                                char_end=fc["char_end"]), bundle["citations"])
+                items.append((stem, bundle, c, fc["y_true"], fc["claim_id"]))
+        else:
+            for c in align_bundle(bundle):
+                y = int(any(c.char_start < e and s < c.char_end for s, e in gold[stem]))
+                items.append((stem, bundle, c, y, f"c{c.char_start}"))
+    if frozen:
+        sha.update(frozen["claims_sha256"].encode())
+    if not items:
+        sys.exit("no claims selected")
 
     out = Path(args.out)
     out.mkdir(parents=True, exist_ok=True)
@@ -216,7 +268,10 @@ def main() -> None:
         "dataset": {"version": args.dataset_version, "sha256": sha.hexdigest(), "bundle_ids": ids,
                     "n_bundles": len(ids), "n_claims": len(items),
                     "n_hallucinated": sum(it[3] for it in items),
-                    "segmenter": "blocks/segmenter.py + blocks/aligner.py (align_bundle)"},
+                    "segmenter": ("frozen claims (" + frozen["name"] + ") + blocks/aligner.py (align)") if frozen
+                    else "blocks/segmenter.py + blocks/aligner.py (align_bundle)",
+                    "frozen_set": frozen,
+                    "gold_rules_version": frozen["gold_rules_version"] if frozen else "1.0 (runner overlap rule)"},
         "scorers": {n: scorer_stub_config(n, args) for n in scorer_names},
         "runs": args.runs,
         "code": git_info(),
@@ -274,8 +329,8 @@ def main() -> None:
                     if hasattr(scorer, "reset_samples"):
                         scorer.reset_samples()  # fresh SelfCheckGPT samples every rerun
                     t0, n_new = time.perf_counter(), 0
-                    for i, (stem, bundle, c, y) in enumerate(items):
-                        key = (method, run, stem, f"c{c.char_start}")
+                    for i, (stem, bundle, c, y, cid) in enumerate(items):
+                        key = (method, run, stem, cid)
                         if key in done and done[key]["status"] != "error":
                             continue
                         if spent >= args.max_cost_usd:
@@ -305,13 +360,27 @@ def main() -> None:
                             if type(e).__name__ in STOP_ERRORS:
                                 stopped = row["error"]
                         u = getattr(scorer, "last_usage", None) or {}
+                        calls = list(getattr(scorer, "last_calls", None) or [])
+                        http = list(getattr(scorer, "last_http", None) or [])
                         row.update(prompt_tokens=u.get("prompt_tokens", 0),
                                    completion_tokens=u.get("completion_tokens", 0),
+                                   reasoning_tokens=u.get("reasoning_tokens", 0),
+                                   models_returned=sorted({x["model_returned"] for x in calls if x["model_returned"]}),
+                                   finish_reasons=[x["finish_reason"] for x in calls],
+                                   json_invalid_calls=sum(not x["json_valid"] for x in calls),
+                                   http_status=[h["status"] for h in http],
                                    llm_calls=u.get("calls", 0), http_requests=u.get("http_requests", 0),
                                    retries=max(0, u.get("http_requests", 0) - u.get("calls", 0)))
                         nli = getattr(scorer, "last_nli", None)
                         if nli is not None:
                             row.update(nli_pairs=nli["pairs"], nli_ms=round(nli["ms"], 1))
+                        if calls or http:
+                            with (out / "judge_calls.jsonl").open("a", encoding="utf-8") as fc_out:
+                                fc_out.write(json.dumps({"method": method, "run": run, "bundle": stem,
+                                                         "claim_id": cid, "t": datetime.now(timezone.utc)
+                                                         .isoformat(timespec="seconds"),
+                                                         "calls": calls, "http": http},
+                                                        ensure_ascii=False) + "\n")
                         spent += row["cost_usd"]
                         done[key] = row
                         fout.write(json.dumps(row, ensure_ascii=False) + "\n")
@@ -332,7 +401,7 @@ def main() -> None:
 
             per_run, all_rows = [], []
             for run in range(1, args.runs + 1):
-                rows = [done.get((method, run, it[0], f"c{it[2].char_start}")) for it in items]
+                rows = [done.get((method, run, it[0], it[4])) for it in items]
                 all_rows.extend(r for r in rows if r)
                 ok = [r for r in rows if r and r["score"] is not None]
                 m = {"run": run, "coverage": len(ok) / len(items) if items else 0.0}
@@ -343,11 +412,21 @@ def main() -> None:
                 per_run.append(m)
             complete = all(m["coverage"] == 1.0 for m in per_run)
             f1s = [m["f1"] for m in per_run if "f1" in m]
-            scores_by_claim = [[(done.get((method, r, it[0], f"c{it[2].char_start}")) or {}).get("score")
+            scores_by_claim = [[(done.get((method, r, it[0], it[4])) or {}).get("score")
                                 for r in range(1, args.runs + 1)] for it in items]
             changed = sum(len(set(col)) > 1 for col in scores_by_claim if None not in col)
             llm = {k: sum(r.get(k, 0) for r in all_rows)
-                   for k in ("prompt_tokens", "completion_tokens", "llm_calls", "http_requests", "retries")}
+                   for k in ("prompt_tokens", "completion_tokens", "reasoning_tokens", "llm_calls",
+                             "http_requests", "retries", "json_invalid_calls")}
+            lat = sorted(r["latency_ms"] for r in all_rows if r.get("latency_ms") is not None)
+            http_codes = [s for r in all_rows for s in r.get("http_status", [])]
+            ops = {"models_returned": sorted({m for r in all_rows for m in r.get("models_returned", [])}),
+                   "finish_reasons": {f: sum(x == f for r in all_rows for x in r.get("finish_reasons", []))
+                                      for f in sorted({str(x) for r in all_rows
+                                                       for x in r.get("finish_reasons", [])})},
+                   "http_status_counts": {str(s): http_codes.count(s) for s in sorted(set(http_codes))},
+                   "latency_ms_per_claim": ({"p50": lat[len(lat) // 2], "p95": lat[int(len(lat) * 0.95)],
+                                             "max": lat[-1]} if lat else None)}
             trusted = (args.runs >= 2 and complete and len(f1s) == args.runs
                        and (name != "selfcheck" or hasattr(scorer, "reset_samples")))
             summary["scorers"][method] = {
@@ -360,6 +439,7 @@ def main() -> None:
                 "claims_with_score_change": changed,
                 "samples_reset": True if name == "selfcheck" else None,
                 "llm_usage": llm if name != "presence" else None,
+                "operations": ops if name != "presence" else None,
                 "nli_usage": ({"model": cfg.get("nli_model"), "device": cfg.get("nli_device"),
                                "pairs": sum(r.get("nli_pairs", 0) for r in all_rows),
                                "ms": round(sum(r.get("nli_ms", 0) for r in all_rows), 1)}

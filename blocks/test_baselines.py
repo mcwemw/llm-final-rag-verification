@@ -423,3 +423,37 @@ def test_export_bundle_id_is_bare_response_id():
     from tools.export_scores import response_id
     assert response_id("ragtruth-12003") == "12003"
     assert response_id("12003") == "12003"
+
+
+def test_call_record_keeps_judge_audit_fields():
+    from types import SimpleNamespace as NS
+    from blocks.baselines import _call_record
+    resp = NS(model="mistralai/mistral-large-4-1t-a52b",
+              usage=NS(prompt_tokens=10, completion_tokens=30,
+                       completion_tokens_details=NS(reasoning_tokens=25)),
+              choices=[NS(finish_reason="stop", message=NS(content='{"statements": []}'))])
+    r = _call_record(resp, {"response_format": {"type": "json_object"}}, 12.34)
+    assert r["model_returned"] == "mistralai/mistral-large-4-1t-a52b"
+    assert r["response_format"] == "json_object" and r["reasoning_tokens"] == 25
+    assert r["json_valid"] and r["finish_reason"] == "stop" and r["content"] == '{"statements": []}'
+    bad = NS(model="m", usage=None, choices=[NS(finish_reason="length", message=NS(content=""))])
+    assert _call_record(bad, {}, 1.0)["json_valid"] is False
+
+
+def test_frozen_claims_must_match_manifest(tmp_path):
+    import hashlib
+    import json
+    import pytest
+    from tools.run_baselines import load_frozen_claims
+    rows = [{"claim_id": "ragtruth-1-c1", "excluded": False, "y_true": 1},
+            {"claim_id": "ragtruth-1-c2", "excluded": True, "y_true": 0}]
+    p = tmp_path / "claims.jsonl"
+    p.write_text("".join(json.dumps(r) + "\n" for r in rows))
+    man = {"name": "calib_v1.1", "gold_rules_version": "1.1", "segmenter_rules_version": "1.0",
+           "outputs": {"claims.jsonl": hashlib.sha256(p.read_bytes()).hexdigest()}}
+    (tmp_path / "manifest.json").write_text(json.dumps(man))
+    claims, ident = load_frozen_claims(p)
+    assert [c["claim_id"] for c in claims] == ["ragtruth-1-c1"] and ident["gold_rules_version"] == "1.1"
+    p.write_text(p.read_text().replace('"y_true": 1', '"y_true": 0'))  # tampered gold
+    with pytest.raises(SystemExit):
+        load_frozen_claims(p)
