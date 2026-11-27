@@ -1,6 +1,7 @@
 """Gold rules v1.1 + calib_v1.1 evidence checks (offline; uses only committed files)."""
 import hashlib
 import json
+import subprocess
 import sys
 from pathlib import Path
 
@@ -22,6 +23,11 @@ def _manifest_ok(d):
     assert set(m["outputs"]) == on_disk
     for rel, digest in m["outputs"].items():
         assert hashlib.sha256((d / rel).read_bytes()).hexdigest() == digest, rel
+    # every file in the manifest must be committed (".gitignore: *.jsonl" once dropped claims.jsonl)
+    tracked = subprocess.run(["git", "ls-files", str(d)], cwd=ROOT, capture_output=True, text=True).stdout.split()
+    if tracked:  # skip outside a git checkout
+        rel_tracked = {str(Path(x).relative_to(d.relative_to(ROOT))) for x in tracked}
+        assert set(m["outputs"]) | {"manifest.json"} <= rel_tracked, set(m["outputs"]) - rel_tracked
     return m
 
 
