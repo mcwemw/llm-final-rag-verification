@@ -44,11 +44,17 @@ Every paid or quota-consuming API run gets a row. Amounts are in **USD**. They a
 | `pilot_nemotron_all_docs` | 78 / 621 | 152 | 152 / 39 | 148,516 | 109,710 | 96,235 | 11:24:52 (paused, resumes after cited_span) |
 | Manual smoke calls (Llama 410; Mistral / Nemotron / Nemotron-VL JSON tests; latency checks) | — | ≈7 | — | not logged | not logged | not logged | 2026-11-27 |
 
-**Total spent (A).**
-- Fireworks billing snapshot: **US$0.29**, cent-rounded, read 2026-11-27. Final reconciliation is **PENDING** (see below).
-- Token-based rows: $0.328. Of this, $0.0044 is estimated (A1, GLM part).
-- The token-based figure is higher because it prices every input token at the uncached list price.
-- No estimated amount is counted as billed.
+**Total spent (A): two figures, kept apart.**
+
+| | Amount (USD) | What it is |
+|---|---|---|
+| **Provider-billed spend** | **0.29** | Fireworks billing snapshot (Spend, November, read 2026-11-27, cent-rounded): Muse 0.20 + GLM 0.07 + DeepSeek 0.02. This is the **spent figure**. |
+| Token × list-price reconstructed cost | ≈ 0.328 | Sum of the A rows. It includes the A1 GLM part ($0.0044, est.) and Inkling ($0.0031, see below). |
+| **Reconciliation variance** | **≈ 0.038** | Reconstructed minus billed. **Cause not yet established**. The input side is billed at about 40% of list (a cached-prefix discount is suspected but unconfirmed); see the reconciliation table. |
+
+- **No double counting.** A1 (≈$0.024 = GLM ≈$0.004 est. + DeepSeek $0.02) and every other Fireworks row are **already included** in the $0.29 provider-billed spend. Never add them to it.
+- **Inkling** (`inkling-2-small`, A4 + A7, ≈$0.0031 reconstructed) has **not appeared on the billing page yet**. It is kept in the rows as usage and is not billing-confirmed.
+- No estimated amount is counted as billed. Final reconciliation is **PENDING** (see below).
 
 ### Billing reconciliation (Fireworks Billing & Usage, Spend, snapshot read 2026-11-27): status **PENDING**
 
@@ -57,8 +63,8 @@ Every paid or quota-consuming API run gets a row. Amounts are in **USD**. They a
 | Muse Spark Open | $0.02 / $0.18 / **$0.20** | $0.050 / $0.173 / $0.223 | A4, A5, A6, A7 |
 | GLM 5.3 Flash | $0.01 / $0.05 / **$0.07** | $0.027 / $0.051 / ≈$0.082 | A1 (GLM part), A2, A3 |
 | DeepSeek V4.1 Flash | **$0.02** | (not logged) | A1 |
-| Inkling 2 Small | not listed | $0.003 | A4, A7 |
-| **Total** | **$0.29** | $0.328 | |
+| Inkling 2 Small | **not yet on billing page** | $0.0031 | A4, A7 |
+| **Total** | **$0.29** (provider-billed) | $0.328 (reconstructed) | variance ≈ $0.038, cause not yet established |
 
 **Findings.**
 - **Output agrees** with the token-based figure: Muse $0.18 vs $0.173, GLM $0.05 vs $0.051.
@@ -112,6 +118,8 @@ These are the API `usage` fields returned by each call. The cost is (input × in
 | A4 | plain, max_tokens 400 | muse-spark-open | 159 | 255 | 238 | 0.001283 |
 | A4 | `response_format=json_object`, max_tokens 400 | inkling-2-small | 32 | 81 | 65 | 0.000091 |
 | A4 | plain, max_tokens 400 | inkling-2-small | 32 | 77 | 61 | 0.000087 |
+| A4 | subtotal | muse-spark-open | 318 | 655 | 635 | 0.003182 |
+| A4 | subtotal | inkling-2-small | 64 | 158 | 126 | 0.000178 |
 | **A4** | **total** | | **382** | **813** | **761** | **0.003360** |
 | A7 | `reasoning_effort` default | muse-spark-open | 239 | 2,108 | 1,961 | 0.009258 |
 | A7 | `reasoning_effort=low` | muse-spark-open | 239 | 739 | 610 | 0.003440 |
@@ -119,6 +127,8 @@ These are the API `usage` fields returned by each call. The cost is (input × in
 | A7 | `reasoning_effort` default | inkling-2-small | 136 | 1,302 | 1,156 | 0.001343 |
 | A7 | `reasoning_effort=low` | inkling-2-small | 136 | 558 | 410 | 0.000599 |
 | A7 | `reasoning_effort=medium` | inkling-2-small | 136 | 962 | 814 | 0.001003 |
+| A7 | subtotal | muse-spark-open | 717 | 4,451 | 4,031 | 0.019814 |
+| A7 | subtotal | inkling-2-small | 408 | 2,822 | 2,380 | 0.002944 |
 | **A7** | **total** | | **1,125** | **7,273** | **6,411** | **0.022758** |
 
 All A7 calls used T=0, top_p=1, max_tokens 4096 and `json_object`. The A7 prompt is a 2-statement judging prompt over a 2-sentence context, the same for all six calls.
@@ -139,3 +149,4 @@ All A7 calls used T=0, top_p=1, max_tokens 4096 and `json_object`. The A7 prompt
 | 2026-11-27 | Ledger created: A1–A7 back-filled from run logs, B1 approved by Emma, C1–C5 pending. | Jimmy |
 | 2026-11-27 | Compared with a Fireworks billing snapshot (cent-rounded, $0.29). A1 DeepSeek part replaced by the billed $0.02; cumulative totals updated. | Jimmy |
 | 2026-11-27 | Review fixes (Emma, PR #12): A1 estimate formula and source; per-call breakdown for A4/A7; NIM changed to "$0 observed (not billing-confirmed)" with a usage snapshot; billing reconciliation kept **PENDING**. | Jimmy |
+| 2026-11-27 | Second review (Emma): totals split into provider-billed $0.29 / reconstructed ≈$0.328 / variance ≈$0.038; A1 and all Fireworks rows marked as included in $0.29 (no double counting); Inkling marked not yet on the billing page; per-model subtotals added for A4/A7. B1 and C unchanged. | Jimmy |
