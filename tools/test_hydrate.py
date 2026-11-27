@@ -26,7 +26,7 @@ def _copy_set(tmp_path):
 
 def _hydrate(tmp_path, frozen=None, data_dir=None):
     return H.hydrate(NAME, data_dir=data_dir or ROOT / "data", out_root=tmp_path / "out",
-                     repo=tmp_path, frozen=frozen or ROOT / "data" / "frozen")
+                     repo=ROOT, frozen=frozen or ROOT / "data" / "frozen")
 
 
 def _nothing_written(tmp_path):
