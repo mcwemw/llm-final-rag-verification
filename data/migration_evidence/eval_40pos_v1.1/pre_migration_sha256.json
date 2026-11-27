@@ -1,0 +1,164 @@
+{
+  "set": "eval_40pos_v1.1",
+  "taken_at_commit": "e8b1644a032a6bd1e847d0f46eb768ad31c71348",
+  "note": "sha256 + size of every tracked file BEFORE migration; hashes only, no text",
+  "files": {
+    "POSITIVES_REVIEW.md": {
+      "sha256": "c7131e45ea2653e06bb45b8eb802cb48ed48863dbf5af3772996942b58e3ec5e",
+      "bytes": 31364
+    },
+    "STATS.md": {
+      "sha256": "247a866730988f515a631e3a4401bb08906d6422cfbce9e70668d2a27f602c6c",
+      "bytes": 3765
+    },
+    "bundles/ragtruth-11908.json": {
+      "sha256": "37b49c029a45a674bebdbebc81d89e871482be149cf7f0a0e5bed036beec4262",
+      "bytes": 4452
+    },
+    "bundles/ragtruth-12016.json": {
+      "sha256": "7f1d8cf2277c124c159d15476163b4f615e6788aa05e9dbcd3302dee57781178",
+      "bytes": 5062
+    },
+    "bundles/ragtruth-12460.json": {
+      "sha256": "270e3cda033fc3868476c61a4670e86d38698513ecbf4a6d1af05baa37292899",
+      "bytes": 4118
+    },
+    "bundles/ragtruth-12518.json": {
+      "sha256": "8080dbb4be9e05db3cd8cf9f3b96027c15ecdc96db7e765cb22c6a753c4f91f2",
+      "bytes": 2910
+    },
+    "bundles/ragtruth-12602.json": {
+      "sha256": "74f81a4c8ab6140c9163afcf681e8e2a9dbd1ce8331427dfe9bdaec6e9f96d2c",
+      "bytes": 4790
+    },
+    "bundles/ragtruth-12765.json": {
+      "sha256": "0961ccffe875d59a26cce97471996be6a1c88977b00caa86c6ab0eab7f716adb",
+      "bytes": 5573
+    },
+    "bundles/ragtruth-13105.json": {
+      "sha256": "886104592d37a516deeb31347d63f26a048e78ee0a864a35211c4c2644674cf1",
+      "bytes": 5817
+    },
+    "bundles/ragtruth-13136.json": {
+      "sha256": "5cc573540f08a5464ab37776786244e4ba6efd7d92f739d74b8c41ca00994193",
+      "bytes": 3875
+    },
+    "bundles/ragtruth-13155.json": {
+      "sha256": "3eac3b900c10a866df13f5d796a627b0f6a09cee4ca85aa96e6a60a61ac51431",
+      "bytes": 3651
+    },
+    "bundles/ragtruth-13363.json": {
+      "sha256": "384400cbd462eabe5cb9f1d72bdc6e7436f7cfa46d68b3f1b8a0d3fc5b538ee5",
+      "bytes": 3620
+    },
+    "bundles/ragtruth-13560.json": {
+      "sha256": "f4132a1b2eb475f645850b42bb84166590b15f19368d862f77929ff5333aa522",
+      "bytes": 2935
+    },
+    "bundles/ragtruth-14007.json": {
+      "sha256": "059f0c42ce46364642605e04a4f7445351a6266d89fa34c4764885fca89245d3",
+      "bytes": 3347
+    },
+    "bundles/ragtruth-14131.json": {
+      "sha256": "99629c6913fc32261244c899c34a6a015fffd77701f0bdffc7c59786c475ca02",
+      "bytes": 2941
+    },
+    "bundles/ragtruth-14293.json": {
+      "sha256": "589ce96ed05d427c077332d4e2b8ff12d4604d9e625f06bae89c229c34e05876",
+      "bytes": 4085
+    },
+    "bundles/ragtruth-14323.json": {
+      "sha256": "d7b2b413a448cfb41d4775db64510891f160935d0136b3cf33610139e2122d1c",
+      "bytes": 3921
+    },
+    "bundles/ragtruth-14747.json": {
+      "sha256": "8df10caeed4b4590532a85c89bc8d2d18131f2fa79734108bece5656b640f087",
+      "bytes": 3353
+    },
+    "bundles/ragtruth-14806.json": {
+      "sha256": "d68839e313eb550c1f703944f5fac3d42d3544f86a3126fc4d03374f6fc5b9a6",
+      "bytes": 3041
+    },
+    "bundles/ragtruth-14846.json": {
+      "sha256": "826a1b84c8472128e7b3f002d66684ffd01d2cb134668787a8b99f60bc14515b",
+      "bytes": 4946
+    },
+    "bundles/ragtruth-15010.json": {
+      "sha256": "926e3a11729c978d1d3b9bc2ce1e5dd209aa9a275687a2f14a396406fed0a4ef",
+      "bytes": 3793
+    },
+    "bundles/ragtruth-15174.json": {
+      "sha256": "fefe6bbcf048043d7fe07e9a528e5646a2b54b44ac0e6adec38fc332fc0e9a8b",
+      "bytes": 3479
+    },
+    "bundles/ragtruth-15343.json": {
+      "sha256": "79a99ca15f4ecd6277f8c465e1019d7af36f3c2eb62236f3b28e7c115b85fa48",
+      "bytes": 3445
+    },
+    "bundles/ragtruth-15677.json": {
+      "sha256": "4de882f6b951646c0a92e2d7916df2e294c119007bb1a4fefaf8c33c4dfd783c",
+      "bytes": 5151
+    },
+    "bundles/ragtruth-15688.json": {
+      "sha256": "92d665d87056a5c348a53db7f85fa503b8a468a31498c2d26b808d5a23ec63fe",
+      "bytes": 4974
+    },
+    "bundles/ragtruth-15735.json": {
+      "sha256": "9eaa4250900bdd125da0597dba924276b6873dec1d81d2fd26310704ed244c6e",
+      "bytes": 3008
+    },
+    "bundles/ragtruth-15755.json": {
+      "sha256": "0049376f879fed480c9e9ed418ad1d066ba8a7fe1621db5b6dfe8d4404d09b42",
+      "bytes": 3202
+    },
+    "bundles/ragtruth-15777.json": {
+      "sha256": "7b0de3d8ba10d77e8cd6ca1e02c23099b2b9727df81be8e1e9b032f4dbc0b378",
+      "bytes": 5060
+    },
+    "bundles/ragtruth-15925.json": {
+      "sha256": "2449272fae7c89c3611e278c3bb5edb4a2a99ea979f4cf536504225bfee3ef8d",
+      "bytes": 3411
+    },
+    "bundles/ragtruth-16056.json": {
+      "sha256": "209d259c3e1684e1e03f0f0c3b4fb5eb410d4eee19db4ad43ed9caaa5f388ce0",
+      "bytes": 2672
+    },
+    "bundles/ragtruth-16510.json": {
+      "sha256": "68eb4db8f05c4da42e19dcdfbcd2d410a04312f62a2590515acad45e5b28a4cb",
+      "bytes": 3163
+    },
+    "bundles/ragtruth-16853.json": {
+      "sha256": "ba34dd91722dab9a5f7858b1cf9c2b4e4ce514ad2e201f63bd074b738874afb2",
+      "bytes": 4541
+    },
+    "bundles/ragtruth-16895.json": {
+      "sha256": "0bac5f0ded2bf4a6e7b68d51eab6323871e403a7d04063d8be5216dcba3d959b",
+      "bytes": 2918
+    },
+    "bundles/ragtruth-17056.json": {
+      "sha256": "29f2cf4289d049a19a7e020b6ee8acbc65c2107b8b8b05971257aadeb0aa6c33",
+      "bytes": 5612
+    },
+    "bundles/ragtruth-17253.json": {
+      "sha256": "eb143f5f411c9067c48883d0edb56ce675fca529ee3a325dbd699d7b0c93c758",
+      "bytes": 4527
+    },
+    "bundles/ragtruth-17570.json": {
+      "sha256": "62edb060bbd8680b313b70695dcbb8423417f9efa7de6a325fefe7c825265b47",
+      "bytes": 4169
+    },
+    "claims.jsonl": {
+      "sha256": "9dbdd397d9d9f815d77844ed38c553158805cb09fb9ff845f489358570b97f39",
+      "bytes": 90870
+    },
+    "manifest.json": {
+      "sha256": "505dde9284b99714e63d49c276cc6aced2ae35d78da18edaf2caf13f00f8be28",
+      "bytes": 8431
+    },
+    "responses.jsonl": {
+      "sha256": "9f6042c5d393024e9146dbd6079ea33f6e6be522d1667feebde78d4bac536e1e",
+      "bytes": 46060
+    }
+  },
+  "manifest_outputs_equal_snapshot": true
+}

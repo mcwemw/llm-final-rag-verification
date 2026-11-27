@@ -31,3 +31,28 @@ faithful**, non-empty = hallucinated. We use this at the response level:
 RAGTruth responses have no inline citation markers, so **every retrieved passage is treated
 as cited** and claims are bound to sources with **`nearest` alignment**. Span offsets index the
 full `source_info.passages` string; see [`../examples/README.md`](../examples/README.md).
+
+## Corpus text, licensing and hydration (2026-11-28)
+**No corpus text is committed to this public repo.**
+- RAGTruth's LICENSE is MIT and names "the Software", with copyright 2023 Particle Media. It does not say the data files are covered. Source: https://github.com/ParticleMedia/RAGTruth/blob/main/LICENSE, read 2026-11-28.
+- The RAGTruth QA passages come from MS MARCO (`"source": "MARCO"`). MS MARCO's terms say the data is "intended for non-commercial research purposes only … without extending any license or other intellectual property rights". They neither grant nor explicitly forbid redistribution. Source: https://microsoft.github.io/msmarco/ ("Terms and Conditions"), read 2026-11-28.
+- Not yet determined: whether MIT covers the RAGTruth data files, and the upstream terms of the CNN/DM and Yelp sources (not used here: we use QA only).
+
+**How frozen sets are stored.** A migrated set (so far `data/frozen/eval_40pos_v1.1/`) keeps only these files:
+- `manifest.json`: unchanged. It holds the sha256 of every full file and is the acceptance target.
+- `STATS.md`
+- `storage.json`
+- `refs/`: ids, offsets and labels only. There is no question, answer, passage text, claim text or annotator note.
+
+Rebuild the full files locally into `data/hydrated/` (gitignored) after fetching the two RAGTruth files above:
+```bash
+python3 tools/hydrate.py eval_40pos_v1.1
+```
+It fails closed and writes nothing in any of these cases:
+- a corpus file is missing, or its sha256 differs from the manifest;
+- a reference file was modified;
+- an id or offset does not match the corpus;
+- any rebuilt file is not byte-identical to the manifest;
+- the output path is tracked or not gitignored.
+
+Migration evidence (hashes only) is in `data/migration_evidence/<set>/`.

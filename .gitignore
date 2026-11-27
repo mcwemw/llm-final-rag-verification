@@ -18,3 +18,6 @@ calibration*/
 *.blg
 *.log
 *.bbl
+
+# hydrated frozen sets (corpus text, rebuilt locally by tools/hydrate.py; never commit)
+data/hydrated/
