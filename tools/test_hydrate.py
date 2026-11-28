@@ -12,8 +12,9 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 import hydrate as H  # noqa: E402
 
 ROOT = Path(__file__).resolve().parent.parent
-NAME = "eval_40pos_v1.1"
+NAME = "eval_40pos_v1.1"           # fail-closed tests use this set
 SET = ROOT / "data" / "frozen" / NAME
+SETS = ["calib_v1", "calib_v1.1", "eval_40pos_v1.1"]   # every reference-only set
 HAVE_CORPUS = all((ROOT / "data" / f).exists() for f in H.CORPUS)
 needs_corpus = pytest.mark.skipif(not HAVE_CORPUS, reason="needs local RAGTruth in data/ (see data/README.md)")
 
@@ -102,9 +103,10 @@ def test_refuses_git_tracked_or_unignored_output(tmp_path):
 
 
 @needs_corpus
-def test_hydrate_succeeds_and_is_byte_identical(tmp_path):
-    out = _hydrate(tmp_path)
-    m = json.loads((SET / "manifest.json").read_text())
+@pytest.mark.parametrize("name", SETS)
+def test_hydrate_succeeds_and_is_byte_identical(tmp_path, name):
+    out = H.hydrate(name, data_dir=ROOT / "data", out_root=tmp_path / "out", repo=ROOT)
+    m = json.loads((ROOT / "data" / "frozen" / name / "manifest.json").read_text())
     for rel, digest in m["outputs"].items():
         assert H.sha256(out / rel) == digest
 
@@ -125,9 +127,18 @@ def _keys(x):
             yield from _keys(v)
 
 
-def test_refs_have_no_text_fields():
+def test_every_set_is_reference_only():
+    assert sorted(p.parent.name for p in (ROOT / "data" / "frozen").glob("*/storage.json")) == SETS
+    for name in SETS:
+        d = ROOT / "data" / "frozen" / name
+        assert not (d / "bundles").exists() and not (d / "claims.jsonl").exists(), name
+
+
+@pytest.mark.parametrize("name", SETS)
+def test_refs_have_no_text_fields(name):
     """Structural check: no JSON/JSONL in the set (refs, storage, manifest) carries a text field."""
-    files = _tracked_files(SET) or [p for p in SET.rglob("*") if p.is_file()]
+    d = ROOT / "data" / "frozen" / name
+    files = _tracked_files(d) or [p for p in d.rglob("*") if p.is_file()]
     for p in files:
         if p.suffix == ".json":
             docs = [json.loads(p.read_text(encoding="utf-8"))]
@@ -148,12 +159,14 @@ def _grams(text, n=8):
 
 
 @needs_corpus
-def test_no_8gram_of_the_sets_corpus_text_in_tracked_files():
+@pytest.mark.parametrize("name", SETS)
+def test_no_8gram_of_the_sets_corpus_text_in_tracked_files(name):
     """Content check: no 8-word window of any response / claim / passage / annotator note of this set
     appears in a tracked file of the set or of the migration evidence."""
     raw = {r["id"]: r for r in H.load_jsonl(ROOT / "data" / "response.jsonl")}
     srcs = {s["source_id"]: s for s in H.load_jsonl(ROOT / "data" / "source_info.jsonl")}
-    ids = [json.loads(l)["id"] for l in (SET / "refs" / "responses.ref.jsonl").read_text().splitlines() if l.strip()]
+    d = ROOT / "data" / "frozen" / name
+    ids = [json.loads(l)["id"] for l in (d / "refs" / "responses.ref.jsonl").read_text().splitlines() if l.strip()]
     corpus = set()
     for i in ids:
         r = raw[i]
@@ -163,7 +176,7 @@ def test_no_8gram_of_the_sets_corpus_text_in_tracked_files():
         for l in r["labels"]:
             corpus |= _grams(l.get("text", "")) | _grams(l.get("meta") or "")
     assert len(corpus) > 1000
-    files = _tracked_files(SET) + _tracked_files(ROOT / "data" / "migration_evidence" / NAME)
+    files = _tracked_files(d) + _tracked_files(ROOT / "data" / "migration_evidence" / name)
     assert files, "run inside a git checkout"
     for p in files:
         hits = _grams(p.read_text(encoding="utf-8", errors="ignore")) & corpus

@@ -1,0 +1,151 @@
+{
+  "set": "calib_v1",
+  "taken_at_commit": "ee273a6f757bdfe48896ebb4c1d856edf6fa4244",
+  "note": "sha256 + size of every tracked file BEFORE migration; hashes only, no text",
+  "files": {
+    "STATS.md": {
+      "sha256": "9494f4d7e4ee766e4b016203df41b0c89a48da08657193c32582c9e6e36476d6",
+      "bytes": 2536
+    },
+    "bundles/ragtruth-12003.json": {
+      "sha256": "69cca6533eeb97d328385c288a6b328f30d7d7ada5bdbff02ae3532326e04b4f",
+      "bytes": 5555
+    },
+    "bundles/ragtruth-12007.json": {
+      "sha256": "161c2656cb3ff2daf4f61c0fe5768829101e64c97a67b96d4018ffeb2fec7e9a",
+      "bytes": 2987
+    },
+    "bundles/ragtruth-12091.json": {
+      "sha256": "119020ea8e03b007eb1150cf8cd0685aa097b32f685038fd64ccb6a63e0033b0",
+      "bytes": 3093
+    },
+    "bundles/ragtruth-12204.json": {
+      "sha256": "77a505981c97e3596d5e487d397696dcadc383cad054451aaedaca5f0cfb11dc",
+      "bytes": 4342
+    },
+    "bundles/ragtruth-12664.json": {
+      "sha256": "b39d594d99dcaffc4a49bc72f640dcf72d2d6d5fa09e024c9703682c35a53201",
+      "bytes": 5182
+    },
+    "bundles/ragtruth-12812.json": {
+      "sha256": "ec01b014873967b2a7479ef7cd0ea7a233e29a4ea9cf0a401c4cd2407c752314",
+      "bytes": 3693
+    },
+    "bundles/ragtruth-12893.json": {
+      "sha256": "3ff97e84de94a1baf7bb4b1c27aad861621d9b45ec3b95c746f80a55b7a4b358",
+      "bytes": 3552
+    },
+    "bundles/ragtruth-12918.json": {
+      "sha256": "6296694dd141d8419fdff4e49b23dffff84fb031bdc73e37094e54c68215d49c",
+      "bytes": 4431
+    },
+    "bundles/ragtruth-12942.json": {
+      "sha256": "fea2a88ac88a7f12150ed0e2dec337afad949a17befffe3960e489bc23a85bf8",
+      "bytes": 4644
+    },
+    "bundles/ragtruth-13051.json": {
+      "sha256": "c40d3e398787a25c9bea0cc8827d07f7662e394dbecfce87fe8739dc7cc658a1",
+      "bytes": 4480
+    },
+    "bundles/ragtruth-13639.json": {
+      "sha256": "0aba2d769c1a532679be549e6ae7ee1e519eae194792b17b96b1e63cfbda246f",
+      "bytes": 2586
+    },
+    "bundles/ragtruth-13798.json": {
+      "sha256": "500fcdbaa857cca4f4a4139b5b2ab877f6779a218553a23bbb3979bb5ae70d28",
+      "bytes": 5714
+    },
+    "bundles/ragtruth-13809.json": {
+      "sha256": "84145ea14cee213b211ea1c847fdd71bd7729051b2ad69556f490898767a63aa",
+      "bytes": 3813
+    },
+    "bundles/ragtruth-13847.json": {
+      "sha256": "64b9f277aeb368ef122cb5090d7a6613aeed026f5ccddf1fa6a67ca53c3c8f9d",
+      "bytes": 4775
+    },
+    "bundles/ragtruth-14739.json": {
+      "sha256": "ed9ce81db03719a281cec1d67d3f843039d56d43f86994a281c08461c93b44e5",
+      "bytes": 5450
+    },
+    "bundles/ragtruth-14770.json": {
+      "sha256": "525be20830d4e67fa42dc48aedd09a0a7058b79ba8804416c70721cededd78ac",
+      "bytes": 4861
+    },
+    "bundles/ragtruth-14840.json": {
+      "sha256": "c56112f6741bd3a12ba7056d14288947b6be7ed368c0c209acc2a341808dae82",
+      "bytes": 2818
+    },
+    "bundles/ragtruth-15037.json": {
+      "sha256": "797e055e0ea38d0421b08af3665ee0b62133aea9592ad5efb22932c1a01e7d30",
+      "bytes": 4684
+    },
+    "bundles/ragtruth-15238.json": {
+      "sha256": "39bebf0a55a0cba7c181e9f6142ce1438e786cde98fab0997192f6a3676188aa",
+      "bytes": 3524
+    },
+    "bundles/ragtruth-15323.json": {
+      "sha256": "c8bb8846e9ead314a224bd9b6e43d7a89911861da2ae3d07f447c76dd05bf622",
+      "bytes": 4211
+    },
+    "bundles/ragtruth-15560.json": {
+      "sha256": "763d986b12d8ce91c6e01fe9941a3eb9249d64645633b927e6f10daada27695c",
+      "bytes": 5647
+    },
+    "bundles/ragtruth-15644.json": {
+      "sha256": "acacf56fff6388e23e6407cab648c1b222f755167ca7d3313e6fba30836c20ab",
+      "bytes": 3930
+    },
+    "bundles/ragtruth-16041.json": {
+      "sha256": "aa5700ecca4b7d54d0ad9bd2a4720399a36941f8412095b46639adf0be4259a0",
+      "bytes": 2957
+    },
+    "bundles/ragtruth-16073.json": {
+      "sha256": "b2d925a5e97421551cdc58195793f66bca35f18cba4488328e0fb39182fab6b9",
+      "bytes": 3208
+    },
+    "bundles/ragtruth-16141.json": {
+      "sha256": "da7a6d08c41b8ec162ba0d71ce07561bf960bf60c2f16c12c0598dcf9ef6753b",
+      "bytes": 4078
+    },
+    "bundles/ragtruth-16422.json": {
+      "sha256": "7a542a05c84ff454bb9a9e3b060fa8311094669bac930cd83e9b5fd656e887ce",
+      "bytes": 2534
+    },
+    "bundles/ragtruth-16578.json": {
+      "sha256": "f37357cd80e4d334e7faf5ef1fa0294bafd58a880296f9702e52b229b2476291",
+      "bytes": 2927
+    },
+    "bundles/ragtruth-16620.json": {
+      "sha256": "9cb057a836fb7b40676b6c94cab562cd9a2fcc68032cae0c2de4975a65779adf",
+      "bytes": 2404
+    },
+    "bundles/ragtruth-16803.json": {
+      "sha256": "ecbb16a6cb4d7cb43515067367561a9530f2395ad1ef78f52e295def212a9f05",
+      "bytes": 3642
+    },
+    "bundles/ragtruth-16888.json": {
+      "sha256": "f4b356e8c880569839ead871439bb5cec73eba8b550a5a35eed98e370545074a",
+      "bytes": 2988
+    },
+    "bundles/ragtruth-17279.json": {
+      "sha256": "ea48b0be2c67ebb90c5ba94bcfd2395e4b58aeb24df6d8bacc2de63a2b0a9286",
+      "bytes": 4955
+    },
+    "bundles/ragtruth-17678.json": {
+      "sha256": "f2197baa2fab155f9954a65ace2763dbd26a24953ba429446bc9e28ce7471c02",
+      "bytes": 3070
+    },
+    "claims.jsonl": {
+      "sha256": "8afffd8e1b5868683bfa11eabb5c7d619fe2a6f0559a6e7003410fb64aec0b62",
+      "bytes": 87710
+    },
+    "manifest.json": {
+      "sha256": "3326b9a6be61f9ce4254afc6c5ac654b93d9d0f7bb01997ba64e9518af489888",
+      "bytes": 4442
+    },
+    "responses.jsonl": {
+      "sha256": "47d81efa7a37dcd8680df5a10172e361c5b3c2c248adf41bc989b6ee1ab2af6e",
+      "bytes": 45777
+    }
+  }
+}
