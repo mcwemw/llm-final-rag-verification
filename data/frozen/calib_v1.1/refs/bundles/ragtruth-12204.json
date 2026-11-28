@@ -1,0 +1,34 @@
+{
+  "ref_format": "ragtruth-ref-v1",
+  "schema_version": "1.1",
+  "response_id": "12204",
+  "source_id": "14351",
+  "citations": [
+    {
+      "doc_id": "ragtruth-14351-p1",
+      "span_start": 10,
+      "span_end": 538
+    },
+    {
+      "doc_id": "ragtruth-14351-p2",
+      "span_start": 550,
+      "span_end": 1055
+    },
+    {
+      "doc_id": "ragtruth-14351-p3",
+      "span_start": 1067,
+      "span_end": 1420
+    }
+  ],
+  "retrieved": [
+    {
+      "doc_id": "ragtruth-14351-p1"
+    },
+    {
+      "doc_id": "ragtruth-14351-p2"
+    },
+    {
+      "doc_id": "ragtruth-14351-p3"
+    }
+  ]
+}

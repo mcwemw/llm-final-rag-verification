@@ -9,6 +9,8 @@ research purposes only ... without extending any license"). A frozen set keeps:
 
 Hydrate (each user, at run time):
     python3 tools/hydrate.py eval_40pos_v1.1          # -> data/hydrated/eval_40pos_v1.1/ (gitignored)
+    python3 tools/hydrate.py calib_v1.1               # sets: calib_v1, calib_v1.1, eval_40pos_v1.1
+    python3 tools/hydrate.py --all
 
 It FAILS CLOSED and writes nothing when:
   * data/response.jsonl or data/source_info.jsonl is missing, or its sha256 differs from the manifest;
@@ -34,6 +36,8 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from build_calib_subset import dedupe_labels  # noqa: E402
 from generate_examples import load_jsonl, to_bundle  # noqa: E402
+from gold_rules import claims_for  # noqa: E402
+from segment import RULES_VERSION  # noqa: E402
 
 ROOT = Path(__file__).resolve().parent.parent
 FROZEN = ROOT / "data" / "frozen"
@@ -131,6 +135,58 @@ def _positives_review(name: str, picked: list[dict], claims: list[dict]) -> str:
     return "".join(lines)
 
 
+def _label_changes_report(picked: list[dict], data_dir: Path) -> str:
+    """Byte-for-byte the LABEL_CHANGES.md tools/build_calib_v1_1.py writes (that file is not modified,
+    so its sha in the calib_v1.1 manifest stays valid); the output sha check proves the equivalence.
+    Scope: the whole RAGTruth QA pool (quality=good), as in the builder."""
+    from collections import Counter
+    srcs = {s["source_id"]: s for s in load_jsonl(data_dir / "source_info.jsonl") if s["task_type"] == "QA"}
+    pool = [r for r in load_jsonl(data_dir / "response.jsonl")
+            if r["source_id"] in srcs and r["quality"] == "good"]
+    changes = []
+    for r in pool:
+        for a, b in zip(claims_for(r, "1.0"), claims_for(r, "1.1")):
+            if not a["excluded"] and (a["gold_verdict"], a["y_true"], a["label_types"]) != \
+                    (b["gold_verdict"], b["y_true"], b["label_types"]):
+                changes.append((r, a, b))
+    calib_ids = {r["id"] for r in picked}
+    n_pos = Counter()
+    for r in pool:
+        for rules in ("1.0", "1.1"):
+            n_pos[(r["split"], rules)] += sum(c["y_true"] for c in claims_for(r, rules) if not c["excluded"])
+    rows = []
+    for r, a, b in sorted(changes, key=lambda x: (x[0]["split"], int(x[0]["id"]))):
+        spans = [l for l in r["labels"] if l["start"] < a["char_end"] and l["end"] > a["char_start"]]
+        ov = "; ".join(repr(r["response"][max(a["char_start"], l["start"]):min(a["char_end"], l["end"])])
+                       for l in spans)
+        where = "**calib_v1 → calib_v1.1**" if r["id"] in calib_ids else ("test pool" if r["split"] == "test"
+                                                                            else "train pool")
+        rows.append(f"| `{a['claim_id']}` | {r['split']} | {where} | {a['gold_verdict']} (y=1) → "
+                    f"{b['gold_verdict']} (y={b['y_true']}) | {ov} | {a['claim_text'][:90]} |\n")
+    return f"""# Gold rules v1.0 → v1.1: label-change report
+
+**Rule change.** A human span overlaps a claim only if the overlapping characters contain at least one
+letter or digit (`str.isalnum`). Pure punctuation or whitespace overlap is no longer content overlap.
+Segmentation is unchanged (tools/segment.py rules v{RULES_VERSION}); only the gold mapping is versioned.
+
+**Scope.** Every non-excluded claim of every RAGTruth QA response with quality=good (train + test).
+The columns compare gold verdict, y_true and label types between the two rules.
+
+| | v1.0 positives | v1.1 positives | changed |
+|---|---|---|---|
+| train | {n_pos[('train', '1.0')]} | {n_pos[('train', '1.1')]} | {sum(1 for r, _, _ in changes if r['split'] == 'train')} |
+| test | {n_pos[('test', '1.0')]} | {n_pos[('test', '1.1')]} | {sum(1 for r, _, _ in changes if r['split'] == 'test')} |
+
+All {len(changes)} changed claims:
+
+| claim_id | split | in | v1.0 → v1.1 | overlapping text | claim |
+|---|---|---|---|---|---|
+{''.join(rows)}
+Response-level labels (`y_true = 1 if labels`) do not depend on this rule, so no response-level
+label changes. eval_40pos is built with v1.1 from the start; see its own STATS.md.
+"""
+
+
 def _guard_output(out: Path, repo: Path) -> None:
     rel = out.resolve().relative_to(repo.resolve()) if out.resolve().is_relative_to(repo.resolve()) else None
     if rel is None:
@@ -208,6 +264,8 @@ def hydrate(name: str, data_dir: Path = DATA, out_root: Path = HYDRATED, repo: P
 
     if "POSITIVES_REVIEW.md" in man["outputs"]:
         files["POSITIVES_REVIEW.md"] = _positives_review(name, picked, claims)
+    if "LABEL_CHANGES.md" in man["outputs"]:
+        files["LABEL_CHANGES.md"] = _label_changes_report(picked, data_dir)
 
     expected = set(storage["hydrated_files"])
     if set(files) != expected:
@@ -235,18 +293,25 @@ def hydrate(name: str, data_dir: Path = DATA, out_root: Path = HYDRATED, repo: P
 
 def main() -> None:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    ap.add_argument("set", help="frozen set name, e.g. eval_40pos_v1.1")
+    ap.add_argument("set", nargs="?", help="frozen set name, e.g. eval_40pos_v1.1")
+    ap.add_argument("--all", action="store_true", help="hydrate every reference-only set in data/frozen")
     ap.add_argument("--make-refs", action="store_true", help="maintainers: write refs/ + storage.json")
     args = ap.parse_args()
+    if bool(args.set) == args.all:
+        ap.error("give one set name or --all")
     if args.make_refs:
+        if args.all:
+            ap.error("--make-refs takes one set")
         s = make_refs(args.set)
         print(f"wrote {len(s['refs'])} reference files + storage.json for {args.set}")
         return
-    try:
-        out = hydrate(args.set)
-    except HydrationError as e:
-        sys.exit(f"HYDRATION FAILED (nothing written): {e}")
-    print(f"hydrated {args.set} -> {out} (every file byte-identical to manifest.json)")
+    names = sorted(p.parent.name for p in FROZEN.glob("*/storage.json")) if args.all else [args.set]
+    for name in names:
+        try:
+            out = hydrate(name)
+        except HydrationError as e:
+            sys.exit(f"HYDRATION FAILED for {name} (nothing written for it): {e}")
+        print(f"hydrated {name} -> {out} (every file byte-identical to manifest.json)")
 
 
 if __name__ == "__main__":
