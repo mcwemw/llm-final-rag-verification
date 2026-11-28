@@ -3,7 +3,10 @@
     python -m tools.pilot_report runs/pilot_nemotron_cited_span [more run dirs] --out report.json
 
 Rules (fixed before looking at Phase 1 results):
-  * The last row per (method, run, claim_id) in scores.jsonl is the result for that cell.
+  * The last row per (method, run, claim_id) in scores.jsonl is the result for that cell; quality
+    metrics use only these final rows.
+  * Cost and tokens are summed over EVERY row of scores.jsonl (all attempts), including error
+    attempts that a resume later replaced: those requests were billed.
   * Legacy logs (before 2026-11-28) wrote an invalid judge output as status "judge_nan" with
     score 0.0. Such rows are read as status "invalid_output", score None, and listed under
     "relabelled" so the change is traceable. The log files themselves are never modified.
@@ -36,12 +39,18 @@ def pct(xs, q):
     return xs[min(len(xs) - 1, int(q * len(xs)))] if xs else None
 
 
+def load_attempts(run_dir: Path) -> list[dict]:
+    """Every row of scores.jsonl, in order: one row per attempt, including attempts that a resume
+    later superseded. Cost and tokens are summed over these (a superseded attempt was still billed)."""
+    return [json.loads(l) for l in (run_dir / "scores.jsonl").read_text(encoding="utf-8").splitlines()
+            if l.strip()]
+
+
 def load_cells(run_dir: Path):
+    """Final result per (method, run, claim_id): the last row wins. Quality metrics use these."""
     cells, relabelled = {}, []
-    for line in (run_dir / "scores.jsonl").read_text(encoding="utf-8").splitlines():
-        if line.strip():
-            r = json.loads(line)
-            cells[(r["method"], r["run"], r["claim_id"])] = r
+    for r in load_attempts(run_dir):
+        cells[(r["method"], r["run"], r["claim_id"])] = r
     for k, r in cells.items():
         if r["status"] == "judge_nan":
             relabelled.append({"run": k[1], "claim_id": k[2], "logged_score": r["score"]})
@@ -94,32 +103,95 @@ def report(run_dir: Path, threshold: float = 0.5) -> dict:
     call_lat = [c["latency_ms"] for a in calls for c in a["calls"] if c.get("latency_ms") is not None]
     http = Counter(h["status"] for a in calls for h in a["http"])
     claim_lat = [r["latency_ms"] for r in rows if r["status"] in ("ok", "invalid_output")]
+    attempts = load_attempts(run_dir)
+    last = {}
+    for i, a in enumerate(attempts):
+        last[(a["method"], a["run"], a["claim_id"])] = i
+    superseded_rows = [a for i, a in enumerate(attempts) if last[(a["method"], a["run"], a["claim_id"])] != i]
+    superseded = len(superseded_rows)
     return {
         "run_dir": str(run_dir), "run_id": manifest["run_id"],
         "dataset": {k: manifest["dataset"].get(k) for k in ("version", "sha256", "n_claims",
                                                               "gold_rules_version")},
         "model": manifest["scorers"].get("ragas", {}).get("config", {}).get("model"),
         "context": manifest["scorers"].get("ragas", {}).get("config", {}).get("context"),
-        "code_commit": manifest["code"].get("commit"),
+        "code_commit": manifest["code"].get("git_sha"), "code_dirty": manifest["code"].get("git_dirty"),
         "threshold": threshold, "relabelled_legacy_judge_nan": relabelled,
         "per_run": per_run, "determinism": det,
         "operations": {
             "claim_evaluations": len(rows),
+            "attempt_rows": len(attempts),
+            "superseded_attempt_rows": superseded,
+            "superseded_status_counts": dict(Counter(r["status"] for r in superseded_rows)),
             "llm_calls": sum(len(a["calls"]) for a in calls),
             "http_requests": sum(http.values()),
             "http_status_counts": {str(k): v for k, v in sorted(http.items())},
             "finish_reasons": dict(Counter(c.get("finish_reason") for a in calls for c in a["calls"])),
             "models_returned": sorted({c.get("model_returned") for a in calls for c in a["calls"]} - {None}),
-            "tokens": {k: sum(r.get(k, 0) for r in rows)
+            "tokens": {k: sum(r.get(k, 0) or 0 for r in attempts)       # all attempts
                        for k in ("prompt_tokens", "completion_tokens", "reasoning_tokens")},
             "call_latency_s": {"mean": statistics.mean(call_lat) / 1000, "p95": pct(call_lat, .95) / 1000}
             if call_lat else None,
             "claim_latency_s": {"mean": statistics.mean(claim_lat) / 1000, "p95": pct(claim_lat, .95) / 1000}
             if claim_lat else None,
-            "cost_usd": sum(r.get("cost_usd") or 0 for r in rows),
+            "cost_usd": sum(r.get("cost_usd") or 0 for r in attempts),     # all attempts (billed)
+            "cost_usd_final_rows_only": sum(r.get("cost_usd") or 0 for r in rows),
             "status_counts": dict(Counter(r["status"] for r in rows)),
         },
     }
+
+
+def _metrics(rows: list[dict], threshold: float) -> dict:
+    y = [r["y_true"] for r in rows]
+    pred = [int(r["score"] < threshold) for r in rows]
+    npos, nneg = sum(y), len(y) - sum(y)
+    fe = sum(t == 1 and q == 0 for t, q in zip(y, pred))
+    fu = sum(t == 0 and q == 1 for t, q in zip(y, pred))
+    agree = sum(t == q for t, q in zip(y, pred))
+    return {"n_valid": len(rows), "n_positive": npos, "n_negative": nneg,
+            "auroc": auroc(y, [1 - r["score"] for r in rows]),
+            "gold_agreement": {"n": agree, "of": len(rows), "rate": agree / len(rows) if rows else None},
+            "false_entailment": {"n": fe, "of": npos, "rate": fe / npos if npos else None},
+            "false_unfaithful": {"n": fu, "of": nneg, "rate": fu / nneg if nneg else None}}
+
+
+def compare(specs: list[tuple[str, Path, int]], threshold: float = 0.5) -> dict:
+    """Same-condition comparison. specs = [(label, run_dir, run)].
+    own_valid: each model on its own final "ok" rows of that run.
+    common_valid: only the claim ids that are "ok" for EVERY model; dropped_by_intersection lists,
+    per model, the claims it had as ok but which are dropped because another model has no valid row."""
+    finals, conds = {}, {}
+    for label, d, run in specs:
+        cells, _ = load_cells(d)
+        finals[label] = {k[2]: r for k, r in cells.items() if k[1] == run}
+        m = json.loads((d / "manifest.json").read_text(encoding="utf-8"))
+        cfg = m["scorers"].get("ragas", {}).get("config", {})
+        conds[label] = {"run_dir": str(d), "run": run, "run_id": m["run_id"],
+                        "dataset_version": m["dataset"].get("version"), "dataset_sha256": m["dataset"].get("sha256"),
+                        "gold_rules_version": m["dataset"].get("gold_rules_version"),
+                        "model": cfg.get("model"), "context": cfg.get("context"),
+                        "temperature": cfg.get("temperature"), "max_tokens": cfg.get("max_tokens"),
+                        "prompt_version": cfg.get("prompt_version"), "code_commit": m["code"].get("git_sha"), "code_dirty": m["code"].get("git_dirty")}
+    same = {k: len({json.dumps(c[k]) for c in conds.values()}) == 1
+            for k in ("dataset_version", "dataset_sha256", "gold_rules_version", "context",
+                      "temperature", "max_tokens", "prompt_version")}
+    claim_sets = [set(f) for f in finals.values()]
+    ok = {lab: {c for c, r in f.items() if r["status"] == "ok"} for lab, f in finals.items()}
+    common = set.intersection(*ok.values())
+    out = {"threshold": threshold, "conditions": conds, "same_condition": same,
+           "same_claim_ids": all(cs == claim_sets[0] for cs in claim_sets),
+           "n_common_valid": len(common), "own_valid": {}, "common_valid": {}}
+    for lab, f in finals.items():
+        own = [f[c] for c in sorted(ok[lab])]
+        dropped = sorted(ok[lab] - common)
+        out["own_valid"][lab] = {**_metrics(own, threshold),
+                                 "excluded": {st: sorted(c for c, r in f.items() if r["status"] == st)
+                                              for st in sorted({r["status"] for r in f.values()} - {"ok"})}}
+        out["common_valid"][lab] = {**_metrics([f[c] for c in sorted(common)], threshold),
+                                    "dropped_by_intersection": {
+                                        c: {o: finals[o][c]["status"] for o in finals if c not in ok[o]}
+                                        for c in dropped}}
+    return out
 
 
 def main() -> None:
@@ -127,7 +199,30 @@ def main() -> None:
     ap.add_argument("run_dirs", nargs="+")
     ap.add_argument("--threshold", type=float, default=0.5)
     ap.add_argument("--out", default=None, help="write the JSON report here")
+    ap.add_argument("--compare", action="store_true",
+                    help="same-condition comparison; give run dirs as LABEL=DIR@RUN (own-valid + common-valid)")
     args = ap.parse_args()
+    if args.compare:
+        specs = []
+        for x in args.run_dirs:
+            label, rest = x.split("=", 1)
+            d, run = rest.rsplit("@", 1)
+            specs.append((label, Path(d), int(run)))
+        c = compare(specs, args.threshold)
+        if args.out:
+            Path(args.out).write_text(json.dumps(c, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+        print("same condition:", c["same_condition"], "| same claim ids:", c["same_claim_ids"],
+              "| common valid:", c["n_common_valid"])
+        for view in ("own_valid", "common_valid"):
+            print(f"-- {view}")
+            for lab, m in c[view].items():
+                extra = (f" excluded={ {k: len(v) for k, v in m['excluded'].items()} }" if view == "own_valid"
+                         else f" dropped_by_intersection={list(m['dropped_by_intersection'])}")
+                print(f"  {lab:9} N={m['n_valid']} pos={m['n_positive']} AUROC={m['auroc']:.3f} "
+                      f"agree={m['gold_agreement']['n']}/{m['gold_agreement']['of']}={m['gold_agreement']['rate']:.3f} "
+                      f"FE={m['false_entailment']['n']}/{m['false_entailment']['of']}={m['false_entailment']['rate']:.3f} "
+                      f"FU={m['false_unfaithful']['n']}/{m['false_unfaithful']['of']}={m['false_unfaithful']['rate']:.3f}{extra}")
+        return
     reps = [report(Path(d), args.threshold) for d in args.run_dirs]
     text = json.dumps(reps, indent=2, ensure_ascii=False)
     if args.out:

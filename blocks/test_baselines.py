@@ -527,3 +527,59 @@ def test_pilot_report_relabels_legacy_judge_nan_and_never_scores_it(tmp_path):
     assert r["determinism"]["claims_ok_in_every_run"] == 2          # c3 is not counted as "stable"
     assert "c3" in r["determinism"]["claims_not_ok_in_every_run"]
     assert '"judge_nan"' in (tmp_path / "scores.jsonl").read_text()  # the log itself is untouched
+
+
+def _write_run(d, rows, model="m", sha="x"):
+    import json
+    d.mkdir(parents=True, exist_ok=True)
+    (d / "scores.jsonl").write_text("".join(json.dumps(r) + "\n" for r in rows))
+    (d / "manifest.json").write_text(json.dumps({
+        "run_id": d.name, "dataset": {"version": "calib_v1.1", "sha256": "s", "gold_rules_version": "1.1"},
+        "scorers": {"ragas": {"config": {"model": model, "context": "cited_span", "temperature": 0.0,
+                                         "max_tokens": 4096, "prompt_version": "p"}}},
+        "code": {"git_sha": sha, "git_dirty": False}}))
+
+
+def test_pilot_report_cost_counts_superseded_error_attempts(tmp_path):
+    """Emma 2026-11-28 MUST FIX: a billed error attempt replaced by a resume still counts in cost/tokens;
+    quality uses only the final successful result."""
+    from tools.pilot_report import report
+    base = {"method": "m", "run": 1, "y_true": 1, "latency_ms": 1}
+    rows = [
+        {**base, "claim_id": "c1", "score": None, "status": "error", "error": "APIStatusError 412",
+         "cost_usd": 0.0079, "prompt_tokens": 500, "completion_tokens": 300, "reasoning_tokens": 200},
+        {**base, "claim_id": "c2", "y_true": 0, "score": 1.0, "status": "ok", "error": None,
+         "cost_usd": 0.01, "prompt_tokens": 1000, "completion_tokens": 600, "reasoning_tokens": 400},
+        {**base, "claim_id": "c1", "score": 0.0, "status": "ok", "error": None,      # resume
+         "cost_usd": 0.02, "prompt_tokens": 1000, "completion_tokens": 600, "reasoning_tokens": 400},
+    ]
+    _write_run(tmp_path / "r", rows)
+    r = report(tmp_path / "r")
+    m = r["per_run"][0]
+    assert m["n_scored"] == 2 and m["status_counts"] == {"ok": 2}               # quality: final rows only
+    assert m["false_entailment"]["n"] == 0 and m["auroc"] == 1.0
+    ops = r["operations"]
+    assert abs(ops["cost_usd"] - 0.0379) < 1e-12                                 # 0.0079 + 0.01 + 0.02
+    assert abs(ops["cost_usd_final_rows_only"] - 0.03) < 1e-12
+    assert ops["tokens"] == {"prompt_tokens": 2500, "completion_tokens": 1500, "reasoning_tokens": 1000}
+    assert ops["attempt_rows"] == 3 and ops["superseded_attempt_rows"] == 1
+    assert ops["superseded_status_counts"] == {"error": 1}
+
+
+def test_compare_common_valid_intersection_and_denominators(tmp_path):
+    from tools.pilot_report import compare
+    def rows(statuses):
+        return [{"method": "m", "run": 1, "claim_id": f"c{i}", "y_true": int(i < 2),
+                 "score": (0.0 if i < 2 else 1.0) if st == "ok" else None, "status": st, "latency_ms": 1}
+                for i, st in enumerate(statuses)]
+    _write_run(tmp_path / "a", rows(["ok", "ok", "ok", "ok"]), model="A")
+    _write_run(tmp_path / "b", rows(["ok", "ok", "invalid_output", "skipped_no_source"]), model="B")
+    c = compare([("a", tmp_path / "a", 1), ("b", tmp_path / "b", 1)])
+    assert c["same_claim_ids"] and c["n_common_valid"] == 2
+    assert c["own_valid"]["a"]["n_valid"] == 4 and c["own_valid"]["b"]["n_valid"] == 2
+    assert c["own_valid"]["b"]["excluded"] == {"invalid_output": ["c2"], "skipped_no_source": ["c3"]}
+    assert c["common_valid"]["a"]["n_valid"] == 2
+    assert c["common_valid"]["a"]["dropped_by_intersection"] == {"c2": {"b": "invalid_output"},
+                                                                 "c3": {"b": "skipped_no_source"}}
+    assert c["common_valid"]["a"]["false_unfaithful"] == {"n": 0, "of": 0, "rate": None}
+    assert c["same_condition"]["context"] and c["same_condition"]["dataset_sha256"]
