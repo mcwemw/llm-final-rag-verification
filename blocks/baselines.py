@@ -177,7 +177,8 @@ class RagasScorer:
         joins every cited_doc instead.
       * provider = groq | fireworks (same gpt-oss-20b weights); recorded in `config`.
       * Per claim: tokens / calls / HTTP requests in `last_usage` (retries = requests - calls),
-        totals in `total_usage`; `last_status` = ok | skipped_no_source | judge_nan.
+        totals in `total_usage`; `last_status` = ok | skipped_no_source | invalid_output
+        (invalid_output: no statements from the judge -> score NaN, never 0).
 
     Interface gap: RAGAS requires the original question (user_input) but the locked
     Block 5 interface passes only (claim, cited_docs). Set it per bundle with
@@ -219,6 +220,7 @@ class RagasScorer:
         self.n_fallback_question = 0
         self.n_nan = 0
         self.last_status = "ok"
+        self.last_invalid_reason: str | None = None
         self._usage = _Usage()
         self._calls: list[dict] = []  # per LLM call of the current claim (judge audit log)
         self._http: list[dict] = []   # per HTTP attempt of the current claim
@@ -346,10 +348,16 @@ class RagasScorer:
         )
         value = float(result.value) if result.value is not None else float("nan")
         self.last_status = "ok"
-        if math.isnan(value):  # judge produced no statements -> treat as unsupported, but count it
+        if math.isnan(value):
+            # The judge returned no statements, so RAGAS has nothing to verify. This is an
+            # invalid judge output, NOT a score of 0: score is NaN, status "invalid_output", and
+            # the runner records score=None and excludes it from every metric (Emma 2026-11-28).
             self.n_nan += 1
-            self.last_status = "judge_nan"
-            value = 0.0
+            self.last_status = "invalid_output"
+            self.last_invalid_reason = "judge returned no statements (RAGAS faithfulness = NaN)"
+            return ScorerResult(claim_id=cid, method=self.name, score=float("nan"),
+                                latency_ms=(time.perf_counter() - t0) * 1000,
+                                cost_usd=self._cost(), deterministic=False)
         return ScorerResult(claim_id=cid, method=self.name,
                             score=max(0.0, min(1.0, value)),
                             latency_ms=(time.perf_counter() - t0) * 1000,

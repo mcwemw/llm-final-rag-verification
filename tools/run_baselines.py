@@ -348,9 +348,18 @@ def main() -> None:
                         t_claim = time.perf_counter()
                         try:
                             res = scorer.score(c, bundle["citations"])
-                            row.update(score=res.score, status=getattr(scorer, "last_status", "ok"),
-                                       error=None, latency_ms=round(res.latency_ms, 1),
-                                       cost_usd=res.cost_usd)
+                            status = getattr(scorer, "last_status", "ok")
+                            if status == "invalid_output":
+                                # never scored as 0: kept with score=None, excluded from metrics,
+                                # and not retried on resume (the judge did answer; re-asking until
+                                # it gives a scorable answer would be selective)
+                                row.update(score=None, status=status,
+                                           error="invalid_output: " + str(getattr(scorer, "last_invalid_reason", "")),
+                                           latency_ms=round(res.latency_ms, 1), cost_usd=res.cost_usd)
+                            else:
+                                row.update(score=res.score, status=status,
+                                           error=None, latency_ms=round(res.latency_ms, 1),
+                                           cost_usd=res.cost_usd)
                         except Exception as e:  # noqa: BLE001 — recorded, never swallowed as 0
                             usage = getattr(scorer, "last_usage", {})
                             cost = 0.0
@@ -408,13 +417,16 @@ def main() -> None:
                 rows = [done.get((method, run, it[0], it[4])) for it in items]
                 all_rows.extend(r for r in rows if r)
                 ok = [r for r in rows if r and r["score"] is not None]
-                m = {"run": run, "coverage": len(ok) / len(items) if items else 0.0}
+                m = {"run": run, "coverage": len(ok) / len(items) if items else 0.0,
+                     "n_invalid_output": sum(1 for r in rows if r and r["status"] == "invalid_output"),
+                     "n_missing_or_error": sum(1 for r in rows if not r or r["status"] == "error")}
                 if ok:
                     ys = [r["y_true"] for r in ok]
                     m.update(prf(ys, [int(r["score"] < args.threshold) for r in ok]))
                     m["auroc"] = auroc(ys, [1 - r["score"] for r in ok])
                 per_run.append(m)
-            complete = all(m["coverage"] == 1.0 for m in per_run)
+            # complete = every claim has a final row; invalid_output rows are final (excluded, not retried)
+            complete = all(m["n_missing_or_error"] == 0 for m in per_run)
             f1s = [m["f1"] for m in per_run if "f1" in m]
             scores_by_claim = [[(done.get((method, r, it[0], it[4])) or {}).get("score")
                                 for r in range(1, args.runs + 1)] for it in items]
@@ -451,6 +463,7 @@ def main() -> None:
                 "cost_usd_estimate": estimate,
                 "cost_usd_actual": sum(r["cost_usd"] for r in all_rows),
                 "n_error_rows": sum(r["status"] == "error" for r in all_rows),
+                "n_invalid_output_rows": sum(r["status"] == "invalid_output" for r in all_rows),
                 "status_counts": {s: sum(r["status"] == s for r in all_rows)
                                   for s in sorted({r["status"] for r in all_rows})},
                 "config": cfg,

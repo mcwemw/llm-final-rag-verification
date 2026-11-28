@@ -1,5 +1,6 @@
 """Tests for Block 5 baselines (M-RAG)."""
 import glob
+import math
 import json
 from pathlib import Path
 
@@ -202,10 +203,12 @@ class TestRagasScorer:
         r = s.score(_claim("none"), DOCS)
         assert r.score == 0.0 and r.cost_usd == 0.0 and calls["n"] == 0
 
-    def test_empty_statements_nan_counted_as_zero(self, ragas_factory):
+    def test_empty_statements_is_invalid_output_not_zero(self, ragas_factory):
         s, _ = ragas_factory([])                   # judge returns no statements -> NaN
         r = s.score(_claim(), DOCS)
-        assert r.score == 0.0 and s.n_nan == 1
+        assert math.isnan(r.score) and r.score != 0.0
+        assert s.last_status == "invalid_output" and s.n_nan == 1 and s.last_invalid_reason
+        assert s.score(_claim(), DOCS) is not None and s.n_nan == 2   # counted every time
 
     def test_many_calls_reuse_one_event_loop(self, ragas_factory):
         s, calls = ragas_factory([1])
@@ -457,3 +460,70 @@ def test_frozen_claims_must_match_manifest(tmp_path):
     p.write_text(p.read_text().replace('"y_true": 1', '"y_true": 0'))  # tampered gold
     with pytest.raises(SystemExit):
         load_frozen_claims(p)
+
+
+def test_runner_records_invalid_output_as_null_not_zero_and_does_not_retry(tmp_path, monkeypatch):
+    """judge_nan regression (Emma 2026-11-28): an invalid judge output is never a 0 score."""
+    import json
+    import sys
+    from types import SimpleNamespace as NS
+    import tools.run_baselines as rb
+
+    class FakeJudge:
+        name = "ragas-llm-judge"
+        config = {"method": "ragas-llm-judge"}
+
+        def __init__(self):
+            self.n = 0
+            self.last_status, self.last_invalid_reason = "ok", None
+
+        def set_question(self, q):
+            pass
+
+        def score(self, claim, docs):
+            self.n += 1
+            bad = self.n == 1                       # the first claim: judge returns no statements
+            self.last_status = "invalid_output" if bad else "ok"
+            self.last_invalid_reason = "judge returned no statements" if bad else None
+            return NS(score=float("nan") if bad else 1.0, latency_ms=1.0, cost_usd=0.0)
+
+    judges = []
+    monkeypatch.setattr(rb, "make_scorer", lambda *a, **k: judges.append(FakeJudge()) or judges[-1])
+    monkeypatch.setattr(rb, "load_env", lambda: None)
+    root = Path(__file__).resolve().parent.parent
+    argv = ["run_baselines", "--bundles", str(root / "examples"),
+            "--gold", str(root / "examples" / "answer_bundle_gold.json"), "--dataset-version", "t",
+            "--out", str(tmp_path), "--scorers", "ragas", "--runs", "1",
+            "--price-in", "0", "--price-out", "0"]
+    monkeypatch.setattr(sys, "argv", argv)
+    rb.main()
+    rows = [json.loads(l) for l in (tmp_path / "scores.jsonl").read_text().splitlines()]
+    bad = [r for r in rows if r["status"] == "invalid_output"]
+    assert len(bad) == 1 and bad[0]["score"] is None and bad[0]["error"].startswith("invalid_output")
+    s = json.loads((tmp_path / "summary.json").read_text())["scorers"]["ragas-llm-judge"]
+    assert s["n_invalid_output_rows"] == 1 and s["complete"] is True
+    assert s["per_run"][0]["n_invalid_output"] == 1 and s["per_run"][0]["coverage"] < 1
+    rb.main()                                   # resume: the invalid row is final, not re-asked
+    assert judges[-1].n == 0
+
+
+def test_pilot_report_relabels_legacy_judge_nan_and_never_scores_it(tmp_path):
+    import json
+    from tools.pilot_report import report
+    rows = [  # 2 runs x 3 claims; c3 was logged as judge_nan with score 0.0 in run 1
+        {"method": "m", "run": 1, "claim_id": "c1", "y_true": 1, "score": 0.0, "status": "ok", "latency_ms": 1},
+        {"method": "m", "run": 1, "claim_id": "c2", "y_true": 0, "score": 1.0, "status": "ok", "latency_ms": 1},
+        {"method": "m", "run": 1, "claim_id": "c3", "y_true": 0, "score": 0.0, "status": "judge_nan", "latency_ms": 1},
+        {"method": "m", "run": 2, "claim_id": "c1", "y_true": 1, "score": 0.0, "status": "ok", "latency_ms": 1},
+        {"method": "m", "run": 2, "claim_id": "c2", "y_true": 0, "score": 1.0, "status": "ok", "latency_ms": 1},
+        {"method": "m", "run": 2, "claim_id": "c3", "y_true": 0, "score": 0.0, "status": "judge_nan", "latency_ms": 1},
+    ]
+    (tmp_path / "scores.jsonl").write_text("".join(json.dumps(r) + "\n" for r in rows))
+    (tmp_path / "manifest.json").write_text(json.dumps({"run_id": "r", "dataset": {}, "scorers": {}, "code": {}}))
+    r = report(tmp_path)
+    assert len(r["relabelled_legacy_judge_nan"]) == 2
+    m = r["per_run"][0]
+    assert m["n_scored"] == 2 and m["false_unfaithful"]["n"] == 0 and m["gold_agreement"] == 1.0
+    assert r["determinism"]["claims_ok_in_every_run"] == 2          # c3 is not counted as "stable"
+    assert "c3" in r["determinism"]["claims_not_ok_in_every_run"]
+    assert '"judge_nan"' in (tmp_path / "scores.jsonl").read_text()  # the log itself is untouched
